@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <title>DT25 Version PC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="w3.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="font-awesome.min.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" media="screen">
+    <script type="text/javascript" src="jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="jquery-sortable-lists.js"></script>
+</head>
+   
+<script>
+   var id, prog, bankName, patchName
+   afficheBank()
+   function afficheBank() {
+      $.get("/getTabValues", function(data) {
+          var val2, val3, bank
+          //Vol=123#Drive=20#...
+          data = data.split("#") // ["Vol=123", "Drive=20"]
+          data.forEach(element => {
+              element = element.split("=") //  ["Vol", "123"]
+              var t = "#"
+              t += element[0]
+              $(t).html(element[1])
+              $(t).val(element[1])
+              console.log(element[0] + " - " + element[1])
+              })
+
+          })
+      }
+</script>
+
+<body class="w3-animate-opacity w3-light-grey">
+   <div class="w3-card w3-dark-grey w3-padding-small w3-center">
+        <h1 id="DT25">DT25</h1>
+   </div>
+
+  <div class="w3-card w3-dark-grey w3-center">
+       <button onclick="SavePatch()" class="w3-button w3-red w3-xlarge w3-ripple w3-wide" style="width:30%;">SAVE</button>
+      <a href="index.html"><button class="w3-button w3-green w3-xlarge w3-ripple w3-wide" style="width:30%;">RETOUR</button></a>
+</div>
+
+   <div class="w3-card w3-dark-grey" style="width:100%;">
+      <ul class="sTree2 listsClass" style="width:100%;" id="sTree2">
+         <li class="s-l-open">
+            <div id="item_1">Item 1</div>
+            <ul class="">
+               <li class="data_id" id="prog_1">
+                  <div id="p1">Prog</div>
+               </li>
+               <li class="data_id" id="prog_2">
+                  <div id="p2">Prog</div>
+               </li>
+               <li class="data_id" id="prog_3">
+                  <div id="p3">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_2">Item 2</div>
+            <ul class="">
+               <li class="data_id" id="prog_4">
+                  <div id="p4">Prog</div>
+               </li>
+               <li class="data_id" id="prog_5">
+                  <div id="p5">Prog</div>
+               </li>
+               <li class="data_id" id="prog_6">
+                  <div id="p6">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_3">Item 3</div>
+            <ul class="">
+               <li class="data_id" id="prog_7">
+                  <div id="p7">Prog</div>
+               </li>
+               <li class="data_id" id="prog_8">
+                  <div id="p8">Prog</div>
+               </li>
+               <li class="data_id" id="prog_9">
+                  <div id="p9">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_4">Item 4</div>
+            <ul class="">
+               <li class="data_id" id="prog_10">
+                  <div id="p10">Prog</div>
+               </li>
+               <li class="data_id" id="prog_11">
+                  <div id="p11">Prog</div>
+               </li>
+               <li class="data_id" id="prog_12">
+                  <div id="p12">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_5">Item 5</div>
+            <ul class="">
+               <li class="data_id" id="prog_13">
+                  <div id="p13">Prog</div>
+               </li>
+               <li class="data_id" id="prog_14">
+                  <div id="p14">Prog</div>
+               </li>
+               <li class="data_id" id="prog_15">
+                  <div id="p15">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_6">Item 6</div>
+            <ul class="">
+               <li class="data_id" id="prog_16">
+                  <div id="p16">Prog</div>
+               </li>
+               <li class="data_id" id="prog_17">
+                  <div id="p17">Prog</div>
+               </li>
+               <li class="data_id" id="prog_18">
+                  <div id="p18">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_7">Item 7</div>
+            <ul class="">
+               <li class="data_id" id="prog_19">
+                  <div id="p19">Prog</div>
+               </li>
+               <li class="data_id" id="prog_20">
+                  <div id="p20">Prog</div>
+               </li>
+               <li class="data_id" id="prog_21">
+                  <div id="p21">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_8">Item 8</div>
+            <ul class="">
+               <li class="data_id" id="prog_22">
+                  <div id="p22">Prog</div>
+               </li>
+               <li class="data_id" id="prog_23">
+                  <div id="p23">Prog</div>
+               </li>
+               <li class="data_id" id="prog_24">
+                  <div id="p24">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_9">Item 9</div>
+            <ul class="">
+               <li class="data_id" id="prog_25">
+                  <div id="p25">Prog</div>
+               </li>
+               <li class="data_id" id="prog_26">
+                  <div id="p26">Prog</div>
+               </li>
+               <li class="data_id" id="prog_27">
+                  <div id="p27">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_10">Item 10</div>
+            <ul class="">
+               <li class="data_id" id="prog_28">
+                  <div id="p28">Prog</div>
+               </li>
+               <li class="data_id" id="prog_29">
+                  <div id="p29">Prog</div>
+               </li>
+               <li class="data_id" id="prog_30">
+                  <div id="p30">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_11">Item 11</div>
+            <ul class="">
+               <li class="data_id" id="prog_31">
+                  <div id="p31">Prog</div>
+               </li>
+               <li class="data_id" id="prog_32">
+                  <div id="p32">Prog</div>
+               </li>
+               <li class="data_id" id="prog_33">
+                  <div id="p33">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_12">Item 12</div>
+            <ul class="">
+               <li class="data_id" id="prog_34">
+                  <div id="p34">Prog</div>
+               </li>
+               <li class="data_id" id="prog_35">
+                  <div id="p35">Prog</div>
+               </li>
+               <li class="data_id" id="prog_36">
+                  <div id="p36">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_13">Item 13</div>
+            <ul class="">
+               <li class="data_id" id="prog_37">
+                  <div id="p37">Prog</div>
+               </li>
+               <li class="data_id" id="prog_38">
+                  <div id="p38">Prog</div>
+               </li>
+               <li class="data_id" id="prog_39">
+                  <div id="p39">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_14">Item 14</div>
+            <ul class="">
+               <li class="data_id" id="prog_40">
+                  <div id="p40">Prog5</div>
+               </li>
+               <li class="data_id" id="prog_41">
+                  <div id="p41">Prog</div>
+               </li>
+               <li class="data_id" id="prog_42">
+                  <div id="p42">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_15">Item 15</div>
+            <ul class="">
+               <li class="data_id" id="prog_43">
+                  <div id="p43">Prog</div>
+               </li>
+               <li class="data_id" id="prog_44">
+                  <div id="p44">Prog</div>
+               </li>
+               <li class="data_id" id="prog_45">
+                  <div id="p45">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_16">Item 16</div>
+            <ul class="">
+               <li class="data_id" id="prog_46">
+                  <div id="p46">Prog</div>
+               </li>
+               <li class="data_id" id="prog_47">
+                  <div id="p47">Prog</div>
+               </li>
+               <li class="data_id" id="prog_48">
+                  <div id="p48">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_17">Item 17</div>
+            <ul class="">
+               <li class="data_id" id="prog_49">
+                  <div id="p49">Prog</div>
+               </li>
+               <li class="data_id" id="prog_50">
+                  <div id="p50">Prog</div>
+               </li>
+               <li class="data_id" id="prog_51">
+                  <div id="p51">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_18">Item 18</div>
+            <ul class="">
+               <li class="data_id" id="prog_52">
+                  <div id="p52">Prog</div>
+               </li>
+               <li class="data_id" id="prog_53">
+                  <div id="p53">Prog</div>
+               </li>
+               <li class="data_id" id="prog_54">
+                  <div id="p54">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_19">Item 19</div>
+            <ul class="">
+               <li class="data_id" id="prog_55">
+                  <div id="p55">Prog</div>
+               </li>
+               <li class="data_id" id="prog_56">
+                  <div id="p56">Prog</div>
+               </li>
+               <li class="data_id" id="prog_57">
+                  <div id="p57">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_20">Item 20</div>
+            <ul class="">
+               <li class="data_id" id="prog_58">
+                  <div id="p58">Prog</div>
+               </li>
+               <li class="data_id" id="prog_59">
+                  <div id="p59">Prog</div>
+               </li>
+               <li class="data_id" id="prog_60">
+                  <div id="p60">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_21">Item 21</div>
+            <ul class="">
+               <li class="data_id" id="prog_61">
+                  <div id="p61">Prog</div>
+               </li>
+               <li class="data_id" id="prog_62">
+                  <div id="p62">Prog</div>
+               </li>
+               <li class="data_id" id="prog_63">
+                  <div id="p63">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_22">Item 22</div>
+            <ul class="">
+               <li class="data_id" id="prog_64">
+                  <div id="p64">Prog</div>
+               </li>
+               <li class="data_id" id="prog_65">
+                  <div id="p65">Prog</div>
+               </li>
+               <li class="data_id" id="prog_66">
+                  <div id="p66">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_23">Item 23</div>
+            <ul class="">
+               <li class="data_id" id="prog_67">
+                  <div id="p67">Prog</div>
+               </li>
+               <li class="data_id" id="prog_68">
+                  <div id="p68">Prog</div>
+               </li>
+               <li class="data_id" id="prog_69">
+                  <div id="p69">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_24">Item 24</div>
+            <ul class="">
+               <li class="data_id" id="prog_70">
+                  <div id="p70">Prog</div>
+               </li>
+               <li class="data_id" id="prog_71">
+                  <div id="p71">Prog</div>
+               </li>
+               <li class="data_id" id="prog_72">
+                  <div id="p72">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_25">Item 25</div>
+            <ul class="">
+               <li class="data_id" id="prog_73">
+                  <div id="p73">Prog</div>
+               </li>
+               <li class="data_id" id="prog_74">
+                  <div id="p74">Prog</div>
+               </li>
+               <li class="data_id" id="prog_75">
+                  <div id="p75">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_26">Item 26</div>
+            <ul class="">
+               <li class="data_id" id="prog_76">
+                  <div id="p76">Prog</div>
+               </li>
+               <li class="data_id" id="prog_77">
+                  <div id="p77">Prog</div>
+               </li>
+               <li class="data_id" id="prog_78">
+                  <div id="p78">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_27">Item 27</div>
+            <ul class="">
+               <li class="data_id" id="prog_79">
+                  <div id="p79">Prog</div>
+               </li>
+               <li class="data_id" id="prog_80">
+                  <div id="p80">Prog</div>
+               </li>
+               <li class="data_id" id="prog_81">
+                  <div id="p81">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_28">Item 28</div>
+            <ul class="">
+               <li class="data_id" id="prog_82">
+                  <div id="p82">Prog</div>
+               </li>
+               <li class="data_id" id="prog_83">
+                  <div id="p83">Prog</div>
+               </li>
+               <li class="data_id" id="prog_84">
+                  <div id="p84">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_29">Item 29</div>
+            <ul class="">
+               <li class="data_id" id="prog_85">
+                  <div id="p85">Prog</div>
+               </li>
+               <li class="data_id" id="prog_86">
+                  <div id="p86">Prog</div>
+               </li>
+               <li class="data_id" id="prog_87">
+                  <div id="p87">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_30">Item 30</div>
+            <ul class="">
+               <li class="data_id" id="prog_88">
+                  <div id="p88">Prog</div>
+               </li>
+               <li class="data_id" id="prog_89">
+                  <div id="p89">Prog</div>
+               </li>
+               <li class="data_id" id="prog_90">
+                  <div id="p90">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_31">Item 31</div>
+            <ul class="">
+               <li class="data_id" id="prog_91">
+                  <div id="p91">Prog</div>
+               </li>
+               <li class="data_id" id="prog_92">
+                  <div id="p92">Prog</div>
+               </li>
+               <li class="data_id" id="prog_93">
+                  <div id="p93">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_32">Item 32</div>
+            <ul class="">
+               <li class="data_id" id="prog_94">
+                  <div id="p94">Prog</div>
+               </li>
+               <li class="data_id" id="prog_95">
+                  <div id="p95">Prog</div>
+               </li>
+               <li class="data_id" id="prog_96">
+                  <div id="p96">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_33">Item 33</div>
+            <ul class="">
+               <li class="data_id" id="prog_97">
+                  <div id="p97">Prog</div>
+               </li>
+               <li class="data_id" id="prog_98">
+                  <div id="p98">Prog</div>
+               </li>
+               <li class="data_id" id="prog_99">
+                  <div id="p99">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_34">Item 34</div>
+            <ul class="">
+               <li class="data_id" id="prog_100">
+                  <div id="p100">Prog</div>
+               </li>
+               <li class="data_id" id="prog_101">
+                  <div id="p101">Prog</div>
+               </li>
+               <li class="data_id" id="prog_102">
+                  <div id="p102">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_35">Item 35</div>
+            <ul class="">
+               <li class="data_id" id="prog_103">
+                  <div id="p103">Prog</div>
+               </li>
+               <li class="data_id" id="prog_104">
+                  <div id="p104">Prog</div>
+               </li>
+               <li class="data_id" id="prog_105">
+                  <div id="p105">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_36">Item 36</div>
+            <ul class="">
+               <li class="data_id" id="prog_106">
+                  <div id="p106">Prog</div>
+               </li>
+               <li class="data_id" id="prog_107">
+                  <div id="p107">Prog</div>
+               </li>
+               <li class="data_id" id="prog_108">
+                  <div id="p108">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_37">Item 37</div>
+            <ul class="">
+               <li class="data_id" id="prog_109">
+                  <div id="p109">Prog</div>
+               </li>
+               <li class="data_id" id="prog_110">
+                  <div id="p110">Prog</div>
+               </li>
+               <li class="data_id" id="prog_111">
+                  <div id="p111">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_38">Item 38</div>
+            <ul class="">
+               <li class="data_id" id="prog_1">
+                  <div id="p1">Prog</div>
+               </li>
+               <li class="data_id" id="prog_2">
+                  <div id="p2">Prog</div>
+               </li>
+               <li class="data_id" id="prog_3">
+                  <div id="p3">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_39">Item 39</div>
+            <ul class="">
+               <li class="data_id" id="prog_1">
+                  <div id="p1">Prog</div>
+               </li>
+               <li class="data_id" id="prog_2">
+                  <div id="p2">Prog</div>
+               </li>
+               <li class="data_id" id="prog_3">
+                  <div id="p3">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_40">Item 40</div>
+            <ul class="">
+               <li class="data_id" id="prog_1">
+                  <div id="p1">Prog</div>
+               </li>
+               <li class="data_id" id="prog_2">
+                  <div id="p2">Prog</div>
+               </li>
+               <li class="data_id" id="prog_3">
+                  <div id="p3">Prog</div>
+               </li>
+            </ul>
+         </li>
+         <li class="s-l-open">
+            <div id="item_41">Item 41</div>
+            <ul class="">
+               <li class="data_id" id="prog_1">
+                  <div id="p1">Prog</div>
+               </li>
+               <li class="data_id" id="prog_2">
+                  <div id="p2">Prog</div>
+               </li>
+               <li class="data_id" id="prog_3">
+                  <div id="p3">Prog</div>
+               </li>
+            </ul>
+         </li>
+      </ul>
+   </div>
+
+</body>
+
+</html>
+
+<script type="text/javascript">
+
+$(function()
+   {
+      var options = {
+         maxLevels: 2,
+         insertZone: 50,
+         //insertZonePlus: true,
+         placeholderCss: {'background-color': '#ff8'},
+         hintCss: {'background-color':'#bbf'},
+         onChange: function( cEl )
+         {
+            console.log( 'onChange' );
+         },
+         complete: function( cEl )
+         {
+            console.log( 'complete' );
+         },
+         isAllowed: function( cEl, hint, target )
+         {
+            // Be carefull if you test some ul/ol elements here.
+            // Sometimes ul/ols are dynamically generated and so they have not some attributes as natural ul/ols.
+            // Be careful also if the hint is not visible. It has only display none so it is at the previous place where it was before(excluding first moves before showing).
+            if( target.data('module') === 'c' && cEl.data('module') !== 'c' )
+            {
+               hint.css('background-color', '#ff9999');
+               return false;
+            }
+            else
+            {
+               hint.css('background-color', '#99ff99');
+               return true;
+            }
+         },
+         opener: {
+            active: true,
+            as: 'html',  // if as is not set plugin uses background image
+            close: '<i class="fa fa-minus c3"></i>',  // or 'fa-minus c3'
+            open: '<i class="fa fa-plus"></i>',  // or 'fa-plus'
+            openerCss: {
+               'display': 'inline-block',
+               //'width': '18px', 'height': '18px',
+               'float': 'left',
+               'margin-left': '-35px',
+               'margin-right': '5px',
+               //'background-position': 'center center', 'background-repeat': 'no-repeat',
+               'font-size': '1.1em'
+            }
+         },
+         ignoreClass: 'clickable'
+      };
+   
+      var optionsPlus = {
+         insertZonePlus: true,
+         placeholderCss: {'background-color': '#ff8'},
+         hintCss: {'background-color':'#bbf'},
+         opener: {
+            active: true,
+            as: 'html',  // if as is not set plugin uses background image
+            close: '<i class="fa fa-minus c3"></i>',
+            open: '<i class="fa fa-plus"></i>',
+            openerCss: {
+               'display': 'inline-block',
+               'float': 'left',
+               'margin-left': '-35px',
+               'margin-right': '5px',
+               'font-size': '1.1em'
+            }
+         }
+      };
+   
+      $('#sTree2').sortableLists( options );
+      //$('#sTreePlus').sortableLists( optionsPlus );
+   
+      //$('#toArrBtn').on( 'click', function(){ console.log( $('#sTree2').sortableListsToArray() ); } );
+      //$('#toHierBtn').on( 'click', function() { console.log( $('#sTree2').sortableListsToHierarchy() ); } );
+      //$('#toStrBtn').on( 'click', function() { console.log( $('#sTree2').sortableListsToString() ); } );
+      //$('.descPicture').on( 'click', function(e) { $(this).toggleClass('descPictureClose'); } );
+   
+      $('.clickable').on('click', function(e)	{ alert('Click works fine! IgnoreClass stopped onDragStart event.'); });
+   
+      /* Scrolling anchors */
+      //$('#toPictureAnch').on( 'mousedown', function( e ) { scrollToAnch( 'pictureAnch' ); return false; } );
+      //$('#toBaseElementAnch').on( 'mousedown', function( e ) { scrollToAnch( 'baseElementAnch' ); return false; } );
+      //$('#toBaseElementAnch2').on( 'mousedown', function( e ) { scrollToAnch( 'baseElementAnch' ); return false; } );
+      //$('#toCssPatternAnch').on( 'mousedown', function( e ) { scrollToAnch( 'cssPatternAnch' ); return false; } );
+   
+      /*function scrollToAnch( id )
+      {
+         return true;
+         $('html, body').animate({
+            scrollTop: '-=-' + $("#" + id).offset().top + 'px'
+         }, 750);
+         return false;
+      }*/
+   
+   });
+   
+</script>
