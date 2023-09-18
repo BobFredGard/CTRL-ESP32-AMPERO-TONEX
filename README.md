@@ -15,4 +15,4 @@ Quand on reste appuyé plus de 2s sur le bouton 1, on entre dans l'édition tota
 
 En ce qui concerne le PACER, il envoit des ProgramChange et des ControlChange sur des canaux différents. Je me sers de ces valeurs envoyées pour déclencher mes propres évènements MIDI à destination de mes 2 appareils!
 
-2 ProgramChange sont envoyer aux 2 appareils si besoin!!!
+2 ProgramChange sont envoyésr aux 2 appareils si besoin!!!
