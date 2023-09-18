@@ -1,5 +1,5 @@
 #include <Arduino.h>
-//String Version = "V0.50"; //OK pour PACER 6 boutons + 6 - Problème sur retour écran Ampero
+const char* Version = "V0.50"; //OK pour PACER 6 boutons + 6 - Problème sur retour écran Ampero
 
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C LCD(0x3F,16,2); 
