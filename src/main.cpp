@@ -120,8 +120,8 @@ static int call(void *data, int argc, char **argv, char **azColName) {
     switch (choixBD){
       case 0 :
         if (m < 55) {params[i][m] = val.toInt(); paramscopy [i][m] = val.toInt();}
-        if (m == 55) {progChang[i][0] = val.toInt(); progChangcopy [i][0]; params[i][m] = 0; paramscopy [i][m] = 0;}
-        if (m == 56) {progChang[i][1] = val.toInt(); progChangcopy [i][1]; params[i][m] = 0; paramscopy [i][m] = 0;}
+        if (m == 55) {progChang[i][0] = val.toInt(); progChangcopy[i][0] = val.toInt();;}
+        if (m == 56) {progChang[i][1] = val.toInt(); progChangcopy[i][1] = val.toInt();;}
         if (m > 56) {params[i][m] = val.toInt(); paramscopy [i][m] = val.toInt();}
         //if (i==11){Serial.println(params[i][m]);}
       break;
@@ -148,10 +148,10 @@ void saveData() {
       }
     }
     if (i == 55){
-        sql += "'"+String(i)+"'="+String(progChang[id+pied][0])+", "; 
+        sql += "'"+String(i)+"'="+String(progChang[id][0])+", "; 
     }
     if (i == 56){
-        sql += "'"+String(i)+"'="+String(progChang[id+pied][1]); 
+        sql += "'"+String(i)+"'="+String(progChang[id][1]); 
     }
   }
   sql += " WHERE stomps_id="+String(id)+";";
@@ -196,10 +196,10 @@ void initEncoder(int val1) {
       enc2last = params[id][count];
     break;
     case 4 :
-      encoder2.setCount(progChang[id+pied][0]); enc2last = progChang[id+pied][0];
+      encoder2.setCount(progChang[id][0]); enc2last = progChang[id][0];
     break;
     case 5 :
-      encoder2.setCount(progChang[id+pied][1]); enc2last = progChang[id+pied][1];
+      encoder2.setCount(progChang[id][1]); enc2last = progChang[id][1];
     break;
     case 6 :
       encoder2.setCount(params[id][count]); enc2last = params[id][count];
@@ -247,8 +247,8 @@ void Screens(byte choixscreen, int val2) {
         }
         if (params[id][count] < 128) {LCD.print(params[id][count]); val2 = -1;} 
       }
-      if(count == 55) {LCD.print(progChang[id+pied][0]); val2 = -1;}
-      if(count == 56) {LCD.print(progChang[id+pied][1]); val2 = -1;} 
+      if(count == 55) {LCD.print(progChang[id][0]); val2 = -1;}
+      if(count == 56) {LCD.print(progChang[id][1]); val2 = -1;} 
     break;
     case 2 :
         LCD.setCursor(0,0);
@@ -326,7 +326,7 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
         pot = encoder1.getCount();
         if (pot > valmaxi) {pot = valmaxi;}
         if (pot < valmini) {pot = valmini;}
-        midiblabla(Amperoquick[0][count1], params[id][Amperoquick[1][count1]], params[id][58]);
+        midiblabla(Amperoquick[0][count1], pot, params[id][58]);
         params[id][Amperoquick[1][count1]] = pot;
         encoder1.setCount(pot);
         enc1last = pot;
@@ -350,7 +350,7 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
         pot = encoder2.getCount();
         if (pot > valmaxi) {pot = valmaxi;}
         if (pot < valmini) {pot = valmini;}
-        midiblabla(toneXquick[0][count2], pot, params[id][56]);
+        midiblabla(toneXquick[0][count2], pot, params[id][57]);
         params[id][toneXquick[1][count2]] = pot;
         encoder2.setCount(pot);
         enc2last = pot;
@@ -362,32 +362,32 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
         if (pot < valmini) {pot = valmini;}
         if (count == 55) {
           progChange(tonevalbk, pot, params[id][57]);
-          progChang[id+pied][0] = pot;
+          progChang[id][0] = pot;
         }
         if (count == 56) {
           progChange(ampvalbk, pot, params[id][58]);
-          progChang[id+pied][1] = pot;
+          progChang[id][1] = pot;
           }
         if (count != 55 or count != 56){
           params[id][count] = pot;
           if (params[id][count] == 139 or params[id][count] == 140){
-            if (count > 17 && count < params[id][56]) {
-              if (params[id][count] == 139){midiblabla(totalCC[0][count], 0, params[id][56]);}
-              else {midiblabla(totalCC[0][count], 127, params[id][56]);}
-            }
+            if (params[id][count] == 139){midiblabla(totalCC[0][count], 0, params[id][57]);}
+            else {midiblabla(totalCC[0][count], 127, params[id][57]);}
           }
-          if (count > 17 && count < params[id][56]) {
-            if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, params[id][56]);}
-            if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, params[id][56]);}
+          if (count > 17 && count < params[id][54]) {
+            Serial.println(count);
+            if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, params[id][57]);}
+            if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, params[id][57]);}
             if (params[id][count] < 128){
-              midiblabla(totalCC[0][count], params[id][count], params[id][56]);
+              midiblabla(totalCC[0][count], pot, params[id][57]);
             }
           }
           if (count > 0 && count < 18) {
+            Serial.println(count);
             if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, params[id][58]);}
             if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, params[id][58]);}
             if (params[id][count] < 128){
-              midiblabla(totalCC[0][count], params[id][count], params[id][58]);
+              midiblabla(totalCC[0][count], pot, params[id][58]);
             }
           }
         }        
@@ -421,11 +421,11 @@ void commun(){
         }
       } 
       else {
-        if (progChang[id+pied][0] < 128 && count == 55){tonevalbk = 0;}
-        if (progChang[id+pied][1] < 128 && count == 56){ampvalbk =  0;}
-        if (progChang[id+pied][0] > 127 && progChang[id+pied][0] < 151 && count == 55){tonevalbk = 1;}
-        if (progChang[id+pied][1] > 127 && progChang[id+pied][1] < 257 && count == 56){ampvalbk = 1;}
-        if (progChang[id+pied][1] > 255 && progChang[id+pied][1] < 301 && count == 56){ampvalbk = 2;}
+        if (progChang[id][0] < 128 && count == 55){tonevalbk = 0;}
+        if (progChang[id][1] < 128 && count == 56){ampvalbk =  0;}
+        if (progChang[id][0] > 127 && progChang[id][0] < 151 && count == 55){tonevalbk = 1;}
+        if (progChang[id][1] > 127 && progChang[id][1] < 257 && count == 56){ampvalbk = 1;}
+        if (progChang[id][1] > 255 && progChang[id][1] < 301 && count == 56){ampvalbk = 2;}
         tmp = -1; encvalMax = valmaxCC[count]; encvalMini = 0; 
       }
     encod2(encvalMini,encvalMax,count,1);          
@@ -518,44 +518,36 @@ void BoutRot(byte choixrot, byte menu) {
 }
 
 void choixprogchang(){
-  if (progChang[id+pied][0] < 128 or progChang[id+pied][1] < 128){ampvalbk = 0; tonevalbk = 0;}
-  if (progChang[id+pied][0] > 127 && progChang[id+pied][0] < 151){tonevalbk = 1;}
-  if (progChang[id+pied][1] > 127 && progChang[id+pied][1] < 257){ampvalbk = 1;}
-  if (progChang[id+pied][1] > 255 && progChang[id+pied][1] < 301){ampvalbk = 2;}
+  if (progChang[id][0] < 128 or progChang[id][1] < 128){ampvalbk = 0; tonevalbk = 0;}
+  if (progChang[id][0] > 127 && progChang[id][0] < 151){tonevalbk = 1;}
+  if (progChang[id][1] > 127 && progChang[id][1] < 257){ampvalbk = 1;}
+  if (progChang[id][1] > 255 && progChang[id][1] < 301){ampvalbk = 2;}
 }
 
 void firstcharg(){
-  progChange(tonevalbk, progChang[id+pied][0], params[id][57]);
-  progChange(ampvalbk,  progChang[id+pied][1], params[id][58]);
+  progChange(tonevalbk, progChang[id][0], params[id][57]);
+  progChange(ampvalbk,  progChang[id][1], params[id][58]);
   delay(10);
   for (i = 18; i < params[id][54]; i++){
-    MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][57]);
-      /*Serial.print("ToneX -> CC : "); Serial.print(totalCC[0][i]); Serial.print(" - Val : ");
-      Serial.print(params[id][i]); Serial.print(" - Channel : "); Serial.println(params[id][57]);*/
+      MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][57]);
   }
   for (i = 1; i < 18; i++){
-    MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][58]);
-      /*Serial.print("Ampero -> CC : "); Serial.print(totalCC[0][i]); Serial.print(" - Val : ");
-      Serial.print(params[id][i]); Serial.print(" - Channel : "); Serial.println(params[id][58]);*/
+      MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][58]);
   }
 }
 
 void chgtPedal() {
-  if (progChang[id+pied][0] != progChangcopy[id+pied][0]) {progChange(tonevalbk, progChang[id+pied][0], params[id][57]);}
-  if (progChang[id+pied][1] != progChangcopy[id+pied][1]) {progChange(ampvalbk,  progChang[id+pied][1], params[id][58]);}
+  if (progChang[id][0] != progChangcopy[id][0]) {progChange(tonevalbk, progChang[id][0], params[id][57]);}
+  if (progChang[id][1] != progChangcopy[id][1]) {progChange(ampvalbk,  progChang[id][1], params[id][58]);}
   delay(10);
   for (i = 18; i < params[id][54]; i++){
     if (params[id][i] != params[preID][i]) {
       MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][57]);
-      /*Serial.print("ToneX -> CC : "); Serial.print(totalCC[0][i]); Serial.print(" - Val : ");
-      Serial.print(params[id][i]); Serial.print(" - Channel : "); Serial.println(params[id][57]); */
     }
   }
   for (i = 1; i < 18; i++){
     if (params[id][i] != params[preID][i]) {
       MIDI.sendControlChange(totalCC[0][i], params[id][i], params[id][58]);
-      /*Serial.print("Ampero -> CC : "); Serial.print(totalCC[0][i]); Serial.print(" - Val : ");
-      Serial.print(params[id][i]); Serial.print(" - Channel : "); Serial.println(params[id][58]);*/
     }
   }
   //mcp.digitalWrite(leds[pied], HIGH);
@@ -567,7 +559,7 @@ void selectBank() {
   if (id > 42 && id < 85) {bank = 2;}
   if (id > 84 && id < 127) {bank = 3;}
   choixprogchang();
-  if (startcharg == 1) {readData(); firstcharg(); oldbank = bank;}
+  if (startcharg == 1) {readData(); choixprogchang(); firstcharg(); oldbank = bank;}
   if (bank != oldbank) {readData(); oldbank = bank;}
 }
 
@@ -638,12 +630,12 @@ void setup() {
   button7.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(1, menus);});
   button8.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(2, menus);});
 
+  MIDI.begin(MIDI_CHANNEL_OMNI);  
+  MIDI.setHandleControlChange(handleControlChange);
+
   if(SPIFFS.begin(true)){
     File root = SPIFFS.open("/"); id = 1, preID = 1; selectBank(); chgtPedal();}
   else {Serial.println("SPIFFS marche pas");} 
-
-  MIDI.begin(MIDI_CHANNEL_OMNI);  
-  MIDI.setHandleControlChange(handleControlChange);
 
   ESP32Encoder::useInternalWeakPullResistors=NONE;
   encoder1.attachSingleEdge(15, 4);
