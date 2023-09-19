@@ -375,7 +375,6 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
             else {midiblabla(totalCC[0][count], 127, params[id][57]);}
           }
           if (count > 17 && count < params[id][54]) {
-            Serial.println(count);
             if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, params[id][57]);}
             if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, params[id][57]);}
             if (params[id][count] < 128){
@@ -383,7 +382,6 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
             }
           }
           if (count > 0 && count < 18) {
-            Serial.println(count);
             if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, params[id][58]);}
             if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, params[id][58]);}
             if (params[id][count] < 128){
