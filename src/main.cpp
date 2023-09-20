@@ -18,7 +18,7 @@ OneButton button8(23, true);
 #include <ESP32Encoder.h>
 ESP32Encoder encoder1;
 ESP32Encoder encoder2;
-static int enc1last, enc2last;
+static int enc1Last, enc2Last;
 
 #include <midi.h>
 MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, MIDI);
@@ -39,10 +39,10 @@ const byte COLOR_WHITE = 0b111;*/
 //const byte rgbcolor [8] = {0b000, 0b100, 0b010, 0b001, 0b101, 0b011, 0b110, 0b111};
 
 int i = 0;
-static short pied, choixBD, oldbank, menus = 0; 
-static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, canal1 = 1; static short canal2 = 2;
+static short choixBD, oldBank, Menus = 0; 
+static short id, id_Init, Count, startScreen, Bank, Couleur1, Couleur2, Count1, Count2, startCharg, Canal1 = 1; static short Canal2 = 2;
 static short preID = -1;
-static int ampvalbk, tonevalbk = 0;
+static int ampValbk, toneValbk = 0;
 
 //unsigned long previousMillis=0 ;
 //unsigned long interval = 1200L;
@@ -63,12 +63,12 @@ static short toneXquick [2] [7] = {{0, 102, 79, 19, 15, 106, 107}, {0, 18, 22, 2
 
 static const char* namequickAmp [7]  {"", "Volume     : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Exp        : ", "Reverb on  :"};
 static const char*  namequickTone [7] {"", "GAIN       : ", "REVERB     : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
-static short leds [7] = {0,21,22,23,24,25,26};
-static short ledscolor [7] = {0,33,32,25,4,5,6};
-static short encvalmax1 [7] = {0,100, 127, 127, 127, 130, 130};
-static short encvalmin1 [7] = {0,0, 0, 0, 0, 129, 129};
-static short encvalmax2 [7] = {0,100, 127, 127, 127, 127, 127};
-static short encvalmin2 [7] = {0,0, 0, 0, 0, 0, 0};
+static short ledS [7] = {0,21,22,23,24,25,26};
+static short ledsColor [7] = {0,33,32,25,4,5,6};
+static short encValmax1 [7] = {0,100, 127, 127, 127, 130, 130};
+static short encValmin1 [7] = {0,0, 0, 0, 0, 129, 129};
+static short encValmax2 [7] = {0,100, 127, 127, 127, 127, 127};
+static short encValmin2 [7] = {0,0, 0, 0, 0, 0, 0};
 
 static const char* namesCC[57] = {  "", 
   "Slot A1    : ", "Slot A2    : ", "Slot A3    : ", "Slot A4    : ", "Slot A5    : ", "Slot A6    : ",
@@ -96,15 +96,15 @@ static short valmaxCC [57] = {0,
   61,150,300
 };
 
-static short params[43][59]; static short paramscopy[43][59];
+static short Params[43][59]; static short paramsCopy[43][59];
 static int progChang [43][2]; static int progChangcopy [43][2];
 
-static const char* texteline1;
-static const char* texteline2;
+static const char* texteLine1;
+static const char* texteLine2;
 String sql;
 
 // ----------------------------------------------GESTTION BASE DE DONNEE
-static const char* data = "Callback function called";
+static const char* daTa = "Callback function called";
 char *zErrMsg = 0;
 
 static int db_open(const char *filename, sqlite3 **db) {
@@ -112,18 +112,18 @@ static int db_open(const char *filename, sqlite3 **db) {
   return 0;
 }
 
-static int call(void *data, int argc, char **argv, char **azColName) {
+static int call(void *daTa, int argc, char **argv, char **azColName) {
   static int m;
   for (m = 0; m<argc; m++){
     String val = argv[m];
     String val2 = azColName[m];
     switch (choixBD){
       case 0 :
-        if (m < 55) {params[i][m] = val.toInt(); paramscopy [i][m] = val.toInt();}
+        if (m < 55) {Params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
         if (m == 55) {progChang[i][0] = val.toInt(); progChangcopy[i][0] = val.toInt();;}
         if (m == 56) {progChang[i][1] = val.toInt(); progChangcopy[i][1] = val.toInt();;}
-        if (m > 56) {params[i][m] = val.toInt(); paramscopy [i][m] = val.toInt();}
-        //if (i==11){Serial.println(params[i][m]);}
+        if (m > 56) {Params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
+        //if (i==11){Serial.println(Params[i][m]);}
       break;
       case 1 :
       break;
@@ -134,7 +134,7 @@ static int call(void *data, int argc, char **argv, char **azColName) {
 }
 
 static int db_exec(sqlite3 *db, const char *sql) {
-  sqlite3_exec(db, sql, call, (void*)data, &zErrMsg);
+  sqlite3_exec(db, sql, call, (void*)daTa, &zErrMsg);
   return 0;
 }
 
@@ -143,8 +143,8 @@ void saveData() {
   sql = "UPDATE stomps SET ";
   for (i = 1; i < 57; i++){
     if (i < 55){
-      if (params[id][i] != paramscopy[id][i]) {
-        sql += "'"+String(i)+"'="+String(params[id][i])+", "; 
+      if (Params[id][i] != paramsCopy[id][i]) {
+        sql += "'"+String(i)+"'="+String(Params[id][i])+", "; 
       }
     }
     if (i == 55){
@@ -163,9 +163,9 @@ void saveData() {
 void readData (){
   if (db_open("/spiffs/base.db", &db_base)) return; 
   static byte o;
-  if (bank == 1 ) {o = id;}
-  if (bank == 2 ) {o = id + 43;}
-  if (bank == 3 ) {o = id + 85;}
+  if (Bank == 1 ) {o = id;}
+  if (Bank == 2 ) {o = id + 43;}
+  if (Bank == 3 ) {o = id + 85;}
   for (i = o; i < o + 42; i++) {
     choixBD = 0;
     sql = "SELECT * FROM stomps WHERE stomps_id = " + String(i) + ";";
@@ -180,29 +180,29 @@ void readData (){
 void initEncoder(int val1) {
   switch (val1)  {
     case 1 :
-      encoder1.setCount(params[id][Amperoquick[1][count1]]);
-      enc1last = params[id][Amperoquick[1][count1]];
-      encoder2.setCount(params[id] [toneXquick[1][count2]]);
-      enc2last = params[id] [toneXquick[1][count2]];
+      encoder1.setCount(Params[id][Amperoquick[1][Count1]]);
+      enc1Last = Params[id][Amperoquick[1][Count1]];
+      encoder2.setCount(Params[id] [toneXquick[1][Count2]]);
+      enc2Last = Params[id] [toneXquick[1][Count2]];
     break;
     case 2 :
-      encoder1.setCount(count);
-      enc1last = count;
+      encoder1.setCount(Count);
+      enc1Last = Count;
     break;
     case 3 :
-      encoder1.setCount(params[id][count]);
-      enc1last = params[id][count];
-      encoder2.setCount(params[id][count]);
-      enc2last = params[id][count];
+      encoder1.setCount(Params[id][Count]);
+      enc1Last = Params[id][Count];
+      encoder2.setCount(Params[id][Count]);
+      enc2Last = Params[id][Count];
     break;
     case 4 :
-      encoder2.setCount(progChang[id][0]); enc2last = progChang[id][0];
+      encoder2.setCount(progChang[id][0]); enc2Last = progChang[id][0];
     break;
     case 5 :
-      encoder2.setCount(progChang[id][1]); enc2last = progChang[id][1];
+      encoder2.setCount(progChang[id][1]); enc2Last = progChang[id][1];
     break;
     case 6 :
-      encoder2.setCount(params[id][count]); enc2last = params[id][count];
+      encoder2.setCount(Params[id][Count]); enc2Last = Params[id][Count];
     break;
   }
 }
@@ -219,44 +219,44 @@ void Screens(byte choixscreen, int val2) {
       LCD.print("TONE X");
     break;
     case 1 :
-      if (count > 0 && count < 18){
+      if (Count > 0 && Count < 18){
         LCD.setCursor(0,0);
-        if (texteline1 != "P:    *AMPERO II") {texteline1 = "P:    *AMPERO II"; LCD.print(texteline1);}
+        if (texteLine1 != "P:    *AMPERO II") {texteLine1 = "P:    *AMPERO II"; LCD.print(texteLine1);}
         texte = String(id) + " ";
         LCD.setCursor(2,0); LCD.print(texte);
       }
-      if (count > 17 && count < 54){
+      if (Count > 17 && Count < 54){
         LCD.setCursor(0,0);        
-        if (texteline1 != "P:       *TONE_X") {texteline1 = ("P:       *TONE_X"); LCD.print(texteline1);}
+        if (texteLine1 != "P:       *TONE_X") {texteLine1 = ("P:       *TONE_X"); LCD.print(texteLine1);}
         LCD.setCursor(2,0); LCD.print(id);
       }
-      if (count == 54){if (texteline1 != " Fin Sauvegd") {LCD.setCursor(5,0); texteline1 = " Fin Sauvegd"; LCD.print(texteline1);}}
-      if (count == 55 or count == 56){if (texteline1 != " Prog Change") {LCD.setCursor(5,0); texteline1 = " Prog Change"; LCD.print(texteline1);}}
+      if (Count == 54){if (texteLine1 != " Fin Sauvegd") {LCD.setCursor(5,0); texteLine1 = " Fin Sauvegd"; LCD.print(texteLine1);}}
+      if (Count == 55 or Count == 56){if (texteLine1 != " Prog Change") {LCD.setCursor(5,0); texteLine1 = " Prog Change"; LCD.print(texteLine1);}}
       LCD.setCursor(0,1);
-      if (texteline2 != namesCC[count]) {texteline2 = namesCC[count]; LCD.print(texteline2);}
+      if (texteLine2 != namesCC[Count]) {texteLine2 = namesCC[Count]; LCD.print(texteLine2);}
       LCD.setCursor(13,1); LCD.print("   ");
       LCD.setCursor(13,1); 
-      if (count != 55 && count != 56) {
+      if (Count != 55 && Count != 56) {
         if (val2 == 139 or val2 == 140) {
           if (val2 == 139) {LCD.setCursor(10,1); LCD.print(":  PRE"); val2 = 139;}
           else {LCD.setCursor(10,1); LCD.print(": POST"); val2 = 140;}
         }
         if (val2 == 130 or val2 == 129) {
-            if (params[id][count] == 130) {LCD.print("ON "); val2 = 130;}
+            if (Params[id][Count] == 130) {LCD.print("ON "); val2 = 130;}
             else {LCD.print("OFF"); val2 = 129;}
         }
-        if (params[id][count] < 128) {LCD.print(params[id][count]); val2 = -1;} 
+        if (Params[id][Count] < 128) {LCD.print(Params[id][Count]); val2 = -1;} 
       }
-      if(count == 55) {LCD.print(progChang[id][0]); val2 = -1;}
-      if(count == 56) {LCD.print(progChang[id][1]); val2 = -1;} 
+      if(Count == 55) {LCD.print(progChang[id][0]); val2 = -1;}
+      if(Count == 56) {LCD.print(progChang[id][1]); val2 = -1;} 
     break;
     case 2 :
         LCD.setCursor(0,0);
-        if (texteline1 != "P:     AMPERO II") {texteline1 = "P:     AMPERO II"; LCD.print(texteline1);}
+        if (texteLine1 != "P:     AMPERO II") {texteLine1 = "P:     AMPERO II"; LCD.print(texteLine1);}
         texte = String(id) + " ";
         LCD.setCursor(2,0); LCD.print(texte);
         LCD.setCursor(0,1);
-        if (texteline2 != namequickAmp[count1]) {texteline2 = namequickAmp[count1]; LCD.print(texteline2);}
+        if (texteLine2 != namequickAmp[Count1]) {texteLine2 = namequickAmp[Count1]; LCD.print(texteLine2);}
         LCD.setCursor(13,1); LCD.print("   ");
         LCD.setCursor(13,1);
         if (val2 == 139 or val2 == 140) {
@@ -267,16 +267,16 @@ void Screens(byte choixscreen, int val2) {
           if (val2 == 130) {LCD.print("ON "); val2 = 130;}
           else {LCD.print("OFF"); val2 = 129;}
         }
-        if (params[id][Amperoquick[1][count1]] < 128) {LCD.print(params[id][Amperoquick[1][count1]]); val2 = -1;}
+        if (Params[id][Amperoquick[1][Count1]] < 128) {LCD.print(Params[id][Amperoquick[1][Count1]]); val2 = -1;}
     break;
     case 3 :
         LCD.setCursor(0,0);
-        if (texteline1 != "P:        TONE_X") {texteline1 = "P:        TONE_X"; LCD.print(texteline1);}
+        if (texteLine1 != "P:        TONE_X") {texteLine1 = "P:        TONE_X"; LCD.print(texteLine1);}
         //LCD.setCursor(0,0); LCD.print("P:");
         texte = String(id) + " ";
         LCD.setCursor(2,0); LCD.print(texte);
         LCD.setCursor(0,1);
-        if (texteline2 != namequickTone[count2]) {texteline2 = namequickTone[count2]; LCD.print(texteline2);}
+        if (texteLine2 != namequickTone[Count2]) {texteLine2 = namequickTone[Count2]; LCD.print(texteLine2);}
         LCD.setCursor(13,1); LCD.print("   ");
         LCD.setCursor(13,1);
         if (val2 == 139 or val2 == 140) {if (val2 == 139) {LCD.setCursor(10,1); LCD.print(":  PRE"); val2 = 139;}
@@ -285,7 +285,7 @@ void Screens(byte choixscreen, int val2) {
           if (val2 == 130) {LCD.print("ON "); val2 = 130;}
           else {LCD.print("OFF"); val2 = 129;}
         }
-        if (params[id][toneXquick[1][count2]] < 128) {LCD.print(params[id][toneXquick[1][count2]]); val2 = -1;}
+        if (Params[id][toneXquick[1][Count2]] < 128) {LCD.print(Params[id][toneXquick[1][Count2]]); val2 = -1;}
     break;
     case 10 :
       LCD.clear();
@@ -298,15 +298,15 @@ void Screens(byte choixscreen, int val2) {
 }
 
 void displayColor1(byte color) {
-  digitalWrite(ledscolor[0], bitRead(color, 2));
-  digitalWrite(ledscolor[1], bitRead(color, 1));
-  digitalWrite(ledscolor[2], bitRead(color, 0));
+  digitalWrite(ledsColor[0], bitRead(color, 2));
+  digitalWrite(ledsColor[1], bitRead(color, 1));
+  digitalWrite(ledsColor[2], bitRead(color, 0));
 }
 
 void displayColor2(byte color) {
-  digitalWrite(ledscolor[5], bitRead(color, 2));
-  digitalWrite(ledscolor[4], bitRead(color, 1));
-  digitalWrite(ledscolor[5], bitRead(color, 0));
+  digitalWrite(ledsColor[5], bitRead(color, 2));
+  digitalWrite(ledsColor[4], bitRead(color, 1));
+  digitalWrite(ledsColor[5], bitRead(color, 0));
 }
 
 void progChange(byte CC, int val, byte canal) {
@@ -326,20 +326,20 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
         pot = encoder1.getCount();
         if (pot > valmaxi) {pot = valmaxi;}
         if (pot < valmini) {pot = valmini;}
-        midiblabla(Amperoquick[0][count1], pot, canal2);
-        params[id][Amperoquick[1][count1]] = pot;
+        midiblabla(Amperoquick[0][Count1], pot, Canal2);
+        Params[id][Amperoquick[1][Count1]] = pot;
         encoder1.setCount(pot);
-        enc1last = pot;
-        Screens(2, params[id][Amperoquick[1][count1]]);
+        enc1Last = pot;
+        Screens(2, Params[id][Amperoquick[1][Count1]]);
     break;
     case 1 :
         pot = encoder1.getCount();
         if (pot > valmaxi) {pot = valmini;}
         if (pot < valmini) {pot = valmaxi;}        
-        count = pot;
+        Count = pot;
         encoder1.setCount(pot);
-        enc1last = pot;
-        Screens(1, params[id][count]);
+        enc1Last = pot;
+        Screens(1, Params[id][Count]);
     break;
   }
 }
@@ -350,83 +350,83 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
         pot = encoder2.getCount();
         if (pot > valmaxi) {pot = valmaxi;}
         if (pot < valmini) {pot = valmini;}
-        midiblabla(toneXquick[0][count2], pot, canal1);
-        params[id][toneXquick[1][count2]] = pot;
+        midiblabla(toneXquick[0][Count2], pot, Canal1);
+        Params[id][toneXquick[1][Count2]] = pot;
         encoder2.setCount(pot);
-        enc2last = pot;
-        Screens(3, params[id][toneXquick[1][count2]]);
+        enc2Last = pot;
+        Screens(3, Params[id][toneXquick[1][Count2]]);
     break;
     case 1 :
         pot = encoder2.getCount();
         if (pot > valmaxi) {pot = valmaxi;}
         if (pot < valmini) {pot = valmini;}
-        if (count == 55) {
-          progChange(tonevalbk, pot, canal1);
+        if (Count == 55) {
+          progChange(toneValbk, pot, Canal1);
           progChang[id][0] = pot;
         }
-        if (count == 56) {
-          progChange(ampvalbk, pot, canal2);
+        if (Count == 56) {
+          progChange(ampValbk, pot, Canal2);
           progChang[id][1] = pot;
           }
-        if (count != 55 or count != 56){
-          params[id][count] = pot;
-          if (params[id][count] == 139 or params[id][count] == 140){
-            if (params[id][count] == 139){midiblabla(totalCC[0][count], 0, canal1);}
-            else {midiblabla(totalCC[0][count], 127, canal1);}
+        if (Count != 55 or Count != 56){
+          Params[id][Count] = pot;
+          if (Params[id][Count] == 139 or Params[id][Count] == 140){
+            if (Params[id][Count] == 139){midiblabla(totalCC[0][Count], 0, Canal1);}
+            else {midiblabla(totalCC[0][Count], 127, Canal1);}
           }
-          if (count > 17 && count < params[id][54]) {
-            if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, canal1);}
-            if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, canal1);}
-            if (params[id][count] < 128){
-              midiblabla(totalCC[0][count], pot, canal1);
+          if (Count > 17 && Count < Params[id][54]) {
+            if (Params[id][Count] == 129){midiblabla(totalCC[0][Count], 0, Canal1);}
+            if (Params[id][Count] == 130){midiblabla(totalCC[0][Count], 127, Canal1);}
+            if (Params[id][Count] < 128){
+              midiblabla(totalCC[0][Count], pot, Canal1);
             }
           }
-          if (count > 0 && count < 18) {
-            if (params[id][count] == 129){midiblabla(totalCC[0][count], 0, canal2);}
-            if (params[id][count] == 130){midiblabla(totalCC[0][count], 127, canal2);}
-            if (params[id][count] < 128){
-              midiblabla(totalCC[0][count], pot, canal2);
+          if (Count > 0 && Count < 18) {
+            if (Params[id][Count] == 129){midiblabla(totalCC[0][Count], 0, Canal2);}
+            if (Params[id][Count] == 130){midiblabla(totalCC[0][Count], 127, Canal2);}
+            if (Params[id][Count] < 128){
+              midiblabla(totalCC[0][Count], pot, Canal2);
             }
           }
         }        
         encoder2.setCount(pot);
-        enc2last = pot;
+        enc2Last = pot;
     break;
   }
 }
 
 void commun(){
-  Screens(1, params[id][count]);
+  Screens(1, Params[id][Count]);
   static int tmp, encvalMax, encvalMini;
-  while (menus == 1) {
+  while (Menus == 1) {
     initEncoder(2);
-    if (count == 55){initEncoder(4);}
-    if (count == 56){initEncoder(5);}
-    if (count != 55 && count !=56){initEncoder(6);}
-    if (enc1last != encoder1.getCount()) {encod1(1,56,count,1); } 
-    if (enc2last != encoder2.getCount()) {
-      if (count != 55 && count != 56) {
-        if (params[id][count] == 139 or params[id][count] == 140){
-          if (params[id][count] == 140) {tmp = 140; encvalMax = 140; encvalMini = 139;}
+    if (Count == 55){initEncoder(4);}
+    if (Count == 56){initEncoder(5);}
+    if (Count != 55 && Count !=56){initEncoder(6);}
+    if (enc1Last != encoder1.getCount()) {encod1(1,56,Count,1); } 
+    if (enc2Last != encoder2.getCount()) {
+      if (Count != 55 && Count != 56) {
+        if (Params[id][Count] == 139 or Params[id][Count] == 140){
+          if (Params[id][Count] == 140) {tmp = 140; encvalMax = 140; encvalMini = 139;}
           else {tmp = 139; encvalMax = 140; encvalMini = 139;}
         }
-        if (params[id][count] == 129 or params[id][count] == 130){
-          if (params[id][count] == 130) {tmp = 130; encvalMax = 130; encvalMini = 129;}
+        if (Params[id][Count] == 129 or Params[id][Count] == 130){
+          if (Params[id][Count] == 130) {tmp = 130; encvalMax = 130; encvalMini = 129;}
           else {tmp = 129; encvalMax = 130; encvalMini = 129;}
         }
-        if (params[id][count] < 128){
-          if (params[id][count] < 128) {tmp = -1; encvalMax = valmaxCC[count]; encvalMini = 0; }
+        if (Params[id][Count] < 128){
+          if (Params[id][Count] < 128) {tmp = -1; encvalMax = valmaxCC[Count]; encvalMini = 0; }
         }
       } 
       else {
-        if (progChang[id][0] < 128 && count == 55){tonevalbk = 0;}
-        if (progChang[id][1] < 128 && count == 56){ampvalbk =  0;}
-        if (progChang[id][0] > 127 && progChang[id][0] < 151 && count == 55){tonevalbk = 1;}
-        if (progChang[id][1] > 127 && progChang[id][1] < 257 && count == 56){ampvalbk = 1;}
-        if (progChang[id][1] > 255 && progChang[id][1] < 301 && count == 56){ampvalbk = 2;}
-        tmp = -1; encvalMax = valmaxCC[count]; encvalMini = 0; 
+        if (progChang[id][0] < 128 && Count == 55){toneValbk = 0;}
+        if (progChang[id][1] < 128 && Count == 56){ampValbk =  0;}
+        if (progChang[id][0] > 127 && progChang[id][0] < 151 && Count == 55){toneValbk = 1;}
+        if (progChang[id][1] > 127 && progChang[id][1] < 257 && Count == 56){ampValbk = 1;}
+        if (progChang[id][1] > 255 && progChang[id][1] < 301 && Count == 56){ampValbk = 2;}
+        tmp = -1; encvalMax = valmaxCC[Count]; encvalMini = 0; 
       }
-    encod2(encvalMini,encvalMax,count,1);          
+    encod2(encvalMini,encvalMax,Count,1);          
     Screens(1, tmp);
     }
     if (digitalRead(5) == 0) {
@@ -434,22 +434,22 @@ void commun(){
       if (digitalRead(23) == 0) {
         Screens(10, 0);
         saveData(); delay(250);
-        count1 = 0; count2 = 0; 
-        if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
+        Count1 = 0; Count2 = 0; 
+        if(Count<18) {startCharg = 2;} else{startCharg = 3;} break;
       }
-      count1 = 0; count2 = 0; 
-      if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
+      Count1 = 0; Count2 = 0; 
+      if(Count<18) {startCharg = 2;} else{startCharg = 3;} break;
     }
     if (digitalRead(23) == 0) {
       delay(250);
       if (digitalRead(5) == 0) {
         Screens(10, 0);
         saveData(); delay(250);
-        count1 = 0; count2 = 0; 
-        if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
+        Count1 = 0; Count2 = 0; 
+        if(Count<18) {startCharg = 2;} else{startCharg = 3;} break;
       }
-      count1 = 0; count2 = 0; 
-      if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
+      Count1 = 0; Count2 = 0; 
+      if(Count<18) {startCharg = 2;} else{startCharg = 3;} break;
     }
   }
 }
@@ -459,33 +459,33 @@ void BoutRot(byte choixrot, byte menu) {
     case 1 :
       switch (menu) {
         case 0 :
-          if (couleur1 == 1) {//displayColor1(rgbcolor[count1]);
-            couleur1 = 2;
+          if (Couleur1 == 1) {//displayColor1(rgbcolor[Count1]);
+            Couleur1 = 2;
           }
           else {
-            if (startcharg == 1){count1 = 0; startcharg = 0;}
-            if (count1 >= 0 &&  count1 < 6) {
-              count1 = count1+1;
+            if (startCharg == 1){Count1 = 0; startCharg = 0;}
+            if (Count1 >= 0 &&  Count1 < 6) {
+              Count1 = Count1+1;
             }
-            else {count1 = 1;}
+            else {Count1 = 1;}
             initEncoder(1);
             byte tmp;
-            if (params[id][Amperoquick[1][count1]] > 135){
-              if (params[id][Amperoquick[1][count1]] == 139) {tmp = 139;}
+            if (Params[id][Amperoquick[1][Count1]] > 135){
+              if (Params[id][Amperoquick[1][Count1]] == 139) {tmp = 139;}
               else {tmp = 140;}
             }
-            if (params[id][Amperoquick[1][count1]] > 128 && params[id][Amperoquick[1][count1]] < 135) {
-              if (params[id][Amperoquick[1][count1]] == 130) {tmp = 130;}
+            if (Params[id][Amperoquick[1][Count1]] > 128 && Params[id][Amperoquick[1][Count1]] < 135) {
+              if (Params[id][Amperoquick[1][Count1]] == 130) {tmp = 130;}
               else {tmp = 129;}
             } 
-            if (params[id][Amperoquick[1][count1]] < 128) {tmp = -1;}
-            if (startscreen != 1) {Screens(2, tmp);} else {startscreen = 0;}
-            //displayColor1(rgbcolor[count1]);
+            if (Params[id][Amperoquick[1][Count1]] < 128) {tmp = -1;}
+            if (startScreen != 1) {Screens(2, tmp);} else {startScreen = 0;}
+            //displayColor1(rgbcolor[Count1]);
           break;
           }
         case 1 : 
-          // Screens(1, params[id][count]);
-          count = 1;
+          // Screens(1, Params[id][Count]);
+          Count = 1;
           commun();
         break;
       }
@@ -493,32 +493,32 @@ void BoutRot(byte choixrot, byte menu) {
     case 2 :
       switch (menu) {
         case 0 : 
-          if (couleur2 == 1) {//displayColor2(rgbcolor[count2]); 
-          couleur2 = 2;
+          if (Couleur2 == 1) {//displayColor2(rgbcolor[Count2]); 
+          Couleur2 = 2;
           }
           else {
-            if (startcharg == 1){count2 = 0; startcharg = 0;}
-            if (count2 >= 0 &&  count2 < 6) {
-              count2 = count2+1;
+            if (startCharg == 1){Count2 = 0; startCharg = 0;}
+            if (Count2 >= 0 &&  Count2 < 6) {
+              Count2 = Count2+1;
             }
-            else {count2 = 1;}
+            else {Count2 = 1;}
             initEncoder(1);
             static byte tmp;
-            if (params[id][toneXquick[1][count2]] > 135){
-              if (params[id][toneXquick[1][count2]] == 139) {tmp = 139;}
+            if (Params[id][toneXquick[1][Count2]] > 135){
+              if (Params[id][toneXquick[1][Count2]] == 139) {tmp = 139;}
               else {tmp = 140;}
             }
-            if (params[id][toneXquick[1][count2]] > 128 && params[id][toneXquick[1][count2]] > 135) {
-                if (params[id][toneXquick[1][count2]] == 130) {tmp = 130;}
+            if (Params[id][toneXquick[1][Count2]] > 128 && Params[id][toneXquick[1][Count2]] > 135) {
+                if (Params[id][toneXquick[1][Count2]] == 130) {tmp = 130;}
                 else {tmp = 129;}
               }
-            if (params[id][toneXquick[1][count2]] > 128) {tmp = -1;}
-            if (startscreen != 1) {Screens(3, tmp);} else {startscreen = 0;}
-           // displayColor1(rgbcolor[count2]);
+            if (Params[id][toneXquick[1][Count2]] > 128) {tmp = -1;}
+            if (startScreen != 1) {Screens(3, tmp);} else {startScreen = 0;}
+           // displayColor1(rgbcolor[Count2]);
           }
         break;
         case 1 :
-          count = 18;
+          Count = 18;
           commun();
         break;
       }
@@ -527,69 +527,67 @@ void BoutRot(byte choixrot, byte menu) {
 }
 
 void choixprogchang(){
-  if (progChang[id][0] < 128 or progChang[id][1] < 128){ampvalbk = 0; tonevalbk = 0;}
-  if (progChang[id][0] > 127 && progChang[id][0] < 151){tonevalbk = 1;}
-  if (progChang[id][1] > 127 && progChang[id][1] < 257){ampvalbk = 1;}
-  if (progChang[id][1] > 255 && progChang[id][1] < 301){ampvalbk = 2;}
+  if (progChang[id][0] < 128 or progChang[id][1] < 128){ampValbk = 0; toneValbk = 0;}
+  if (progChang[id][0] > 127 && progChang[id][0] < 151){toneValbk = 1;}
+  if (progChang[id][1] > 127 && progChang[id][1] < 257){ampValbk = 1;}
+  if (progChang[id][1] > 255 && progChang[id][1] < 301){ampValbk = 2;}
 }
 
 void firstcharg(){
-  progChange(tonevalbk, progChang[id][0], canal1);
-  progChange(ampvalbk,  progChang[id][1], canal2);
+  progChange(toneValbk, progChang[id][0], Canal1);
+  progChange(ampValbk,  progChang[id][1], Canal2);
   delay(10);
-  for (i = 18; i < params[id][54]; i++){
-      MIDI.sendControlChange(totalCC[0][i], params[id][i], canal1);
+  for (i = 18; i < Params[id][54]; i++){
+      MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal1);
   }
   for (i = 1; i < 18; i++){
-      MIDI.sendControlChange(totalCC[0][i], params[id][i], canal2);
+      MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal2);
   }
 }
 
 void chgtPedal() {
-  if (progChang[id][0] != progChangcopy[id][0]) {progChange(tonevalbk, progChang[id][0], canal1);}
-  if (progChang[id][1] != progChangcopy[id][1]) {progChange(ampvalbk,  progChang[id][1], canal2);}
+  if (progChang[id][0] != progChangcopy[id][0]) {progChange(toneValbk, progChang[id][0], Canal1);}
+  if (progChang[id][1] != progChangcopy[id][1]) {progChange(ampValbk,  progChang[id][1], Canal2);}
   delay(10);
-  for (i = 18; i < params[id][54]; i++){
-    if (params[id][i] != params[preID][i]) {
-      MIDI.sendControlChange(totalCC[0][i], params[id][i], canal1);
+  for (i = 18; i < Params[id][54]; i++){
+    if (Params[id][i] != Params[preID][i]) {
+      MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal1);
     }
   }
   for (i = 1; i < 18; i++){
-    if (params[id][i] != params[preID][i]) {
-      MIDI.sendControlChange(totalCC[0][i], params[id][i], canal2);
+    if (Params[id][i] != Params[preID][i]) {
+      MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal2);
     }
   }
-  //mcp.digitalWrite(leds[pied], HIGH);
-  //mcp.digitalWrite(leds[preID], LOW);
+  //mcp.digitalWrite(ledS[id], HIGH);
+  //mcp.digitalWrite(ledS[id], LOW);
 }
 
 void selectBank() {
-  if (id < 43) {bank = 1;}
-  if (id > 42 && id < 85) {bank = 2;}
-  if (id > 84 && id < 127) {bank = 3;}
+  if (id < 43) {Bank = 1;}
+  if (id > 42 && id < 85) {Bank = 2;}
+  if (id > 84 && id < 127) {Bank = 3;}
   choixprogchang();
-  if (startcharg == 1) {readData(); choixprogchang(); firstcharg(); oldbank = bank;}
-  if (bank != oldbank) {readData(); oldbank = bank;}
+  if (startCharg == 1) {readData(); choixprogchang(); firstcharg(); oldBank = Bank;}
+  if (Bank != oldBank) {readData(); oldBank = Bank;}
 }
 
 void handleControlChange(byte channel, byte number, byte value) {
   if (channel == 16) {
     preID = id; 
-    id_init = value; id = value;
-    pied = 0;
-    count1 = 0; count2 = 0; menus = 0;
+    id_Init = value; id = value;
+    Count1 = 0; Count2 = 0; Menus = 0;
     selectBank(); chgtPedal();
-    BoutRot(1, menus);
+    BoutRot(1, Menus);
     Screens(2, 0);
   }
 
   if (channel == 15) {
     preID = id; 
-    id = id_init + value;
-    pied = value; 
-    count1 = 0; count2 = 0; menus = 0;
+    id = id_Init + value;
+    Count1 = 0; Count2 = 0; Menus = 0;
     selectBank(); chgtPedal();
-    BoutRot(1, menus);
+    BoutRot(1, Menus);
     Screens(2, 0);
   }
 }
@@ -597,7 +595,7 @@ void handleControlChange(byte channel, byte number, byte value) {
 void setup() {
   pinMode(33, OUTPUT); pinMode(32, OUTPUT); pinMode(25, OUTPUT);
 
-  pied = 0; preID = -1; 
+  preID = -1; 
   
   LCD.init();
   LCD.backlight();
@@ -621,14 +619,14 @@ void setup() {
   button7.setPressTicks(500);
   button8.setPressTicks(500);
 
-  /*button1.attachClick([] () {if(menus == 0) {preID = pied; pied = 0; id = id_init;   chgtPedal();}});
-  button2.attachClick([] () {if(menus == 0) {preID = pied; pied = 1; id = id_init+1; chgtPedal();}});
-  button3.attachClick([] () {if(menus == 0) {preID = pied; pied = 2; id = id_init+2; chgtPedal();}});
-  button4.attachClick([] () {if(menus == 0) {preID = pied; pied = 3; id = id_init+3; chgtPedal();}});
-  button5.attachClick([] () {if(menus == 0) {preID = pied; pied = 4; id = id_init+4; chgtPedal();}});
-  button6.attachClick([] () {if(menus == 0) {preID = pied; pied = 5; id = id_init+5; chgtPedal();}});*/
-  button7.attachClick([] () {if(menus == 0) {BoutRot(1, menus);}}); //if(menus == 1) {BoutRot(1, menus);}});
-  button8.attachClick([] () {if(menus == 0) {BoutRot(2, menus);}}); //if(menus == 1) {BoutRot(2, menus);}});
+  /*button1.attachClick([] () {if(Menus == 0) {id = id_Init;   chgtPedal();}});
+  button2.attachClick([] () {if(Menus == 0) {preID = id; id = id_Init+1; chgtPedal();}});
+  button3.attachClick([] () {if(Menus == 0) {preID = id; id = id_Init+2; chgtPedal();}});
+  button4.attachClick([] () {if(Menus == 0) {preID = id; id = id_Init+3; chgtPedal();}});
+  button5.attachClick([] () {if(Menus == 0) {preID = id; id = id_Init+4; chgtPedal();}});
+  button6.attachClick([] () {if(Menus == 0) {preID = id; id = id_Init+5; chgtPedal();}});*/
+  button7.attachClick([] () {if(Menus == 0) {BoutRot(1, Menus);}}); //if(Menus == 1) {BoutRot(1, Menus);}});
+  button8.attachClick([] () {if(Menus == 0) {BoutRot(2, Menus);}}); //if(Menus == 1) {BoutRot(2, Menus);}});
 
  /*button1.attachLongPressStop([] () {});
   button2.attachLongPressStop([] () {});
@@ -636,8 +634,8 @@ void setup() {
   button4.attachLongPressStop([] () {});
   button5.attachLongPressStop([] () {});
   button6.attachLongPressStop([] () {});*/
-  button7.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(1, menus);});
-  button8.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(2, menus);});
+  button7.attachLongPressStop([] () {texteLine2 = "toto"; Menus = 1; BoutRot(1, Menus);});
+  button8.attachLongPressStop([] () {texteLine2 = "toto"; Menus = 1; BoutRot(2, Menus);});
 
   MIDI.begin(MIDI_CHANNEL_OMNI);  
   MIDI.setHandleControlChange(handleControlChange);
@@ -658,9 +656,9 @@ void setup() {
 
   initEncoder(1);
 
-  texteline2, texteline1 = "toto";
-  BoutRot(1, menus);
-  BoutRot(2, menus);
+  texteLine2, texteLine1 = "toto";
+  BoutRot(1, Menus);
+  BoutRot(2, Menus);
   //id = 40;
   Screens(2, 0);
 }
@@ -675,18 +673,18 @@ void loop(){
   button6.tick();*/
   button7.tick();
   button8.tick();
-  if (enc1last != encoder1.getCount()) {
-    if (count1 == 0) {count1 = 1;}
-    encod1(encvalmin1[count1],encvalmax1[count1],params[id][Amperoquick[1][count1]],0);
-    texteline2, texteline1 = "toto";
+  if (enc1Last != encoder1.getCount()) {
+    if (Count1 == 0) {Count1 = 1;}
+    encod1(encValmin1[Count1],encValmax1[Count1],Params[id][Amperoquick[1][Count1]],0);
+    texteLine2, texteLine1 = "toto";
   }  
-  if (enc2last != encoder2.getCount()) {
-    if (count2 == 0) {count2 = 1;}
-    encod2(encvalmin2[count2],encvalmax2[count2],params[id] [toneXquick[1][count2]],0);
-    texteline2, texteline1 = "toto";
+  if (enc2Last != encoder2.getCount()) {
+    if (Count2 == 0) {Count2 = 1;}
+    encod2(encValmin2[Count2],encValmax2[Count2],Params[id] [toneXquick[1][Count2]],0);
+    texteLine2, texteLine1 = "toto";
   }
   MIDI.read();
-  if (startcharg == 2) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(1, menus); Screens(2, 0);}  
-  if (startcharg == 3) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(2, menus); Screens(3, 0);}
+  if (startCharg == 2) {startCharg = 0; Menus = 0; texteLine1 = "toto"; texteLine2 = "toto"; BoutRot(1, Menus); Screens(2, 0);}  
+  if (startCharg == 3) {startCharg = 0; Menus = 0; texteLine1 = "toto"; texteLine2 = "toto"; BoutRot(2, Menus); Screens(3, 0);}
 }
 
