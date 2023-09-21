@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 const char* Version = "V0.60"; //OK pour PACER 6 boutons + 6
 
@@ -97,7 +98,7 @@ static short valmaxCC [57] = {0,
 };
 
 static short Params[43][59]; static short paramsCopy[43][59];
-static int progChang [43][2]; 
+static int progChang [43][2]; static int progChangcopy [43][2];
 
 static const char* texteLine1;
 static const char* texteLine2;
@@ -120,8 +121,8 @@ static int call(void *daTa, int argc, char **argv, char **azColName) {
     switch (choixBD){
       case 0 :
         if (m < 55) {Params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
-        if (m == 55) {progChang[i][0] = val.toInt();}
-        if (m == 56) {progChang[i][1] = val.toInt();}
+        if (m == 55) {progChang[i][0] = val.toInt(); progChangcopy[i][0] = val.toInt();;}
+        if (m == 56) {progChang[i][1] = val.toInt(); progChangcopy[i][1] = val.toInt();;}
         if (m > 56) {Params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
         //if (i==11){Serial.println(Params[i][m]);}
       break;
@@ -535,28 +536,23 @@ void choixprogchang(){
 
 void firstcharg(){
   progChange(toneValbk, progChang[id][0], Canal1);
-  delay(50);
   progChange(ampValbk,  progChang[id][1], Canal2);
-  delay(50);
+  delay(10);
   for (i = 18; i < Params[id][54]; i++){
       MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal1);
-  delay(50);
   }
   for (i = 1; i < 18; i++){
       MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal2);
-  delay(50);
   }
 }
 
 void chgtPedal() {
-  if (progChang[id][0] != progChang[preID][0]) {progChange(toneValbk, progChang[id][0], Canal1);}
-  delay(10);
-  if (progChang[id][1] != progChang[preID][1]) {progChange(ampValbk,  progChang[id][1], Canal2);}
+  if (progChang[id][0] != progChangcopy[id][0]) {progChange(toneValbk, progChang[id][0], Canal1);}
+  if (progChang[id][1] != progChangcopy[id][1]) {progChange(ampValbk,  progChang[id][1], Canal2);}
   delay(10);
   for (i = 18; i < Params[id][54]; i++){
     if (Params[id][i] != Params[preID][i]) {
       MIDI.sendControlChange(totalCC[0][i], Params[id][i], Canal1);
-  delay(10);
     }
   }
   for (i = 1; i < 18; i++){
@@ -646,7 +642,7 @@ void setup() {
   MIDI.setHandleControlChange(handleControlChange);
 
   if(SPIFFS.begin(true)){
-    File root = SPIFFS.open("/"); id = 1, preID = 1; startCharg = 1; selectBank(); }
+    File root = SPIFFS.open("/"); id = 1, preID = 1; selectBank(); chgtPedal();}
   else {Serial.println("SPIFFS marche pas");} 
 
   ESP32Encoder::useInternalWeakPullResistors=NONE;
