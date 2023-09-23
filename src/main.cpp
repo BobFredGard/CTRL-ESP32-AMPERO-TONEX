@@ -58,10 +58,10 @@ static short totalcc [2][54] =  {
 
                                    //  |--------CC----------|      |--Positions dans BD--|
 static short amperoquick [2] [7] = {{0, 7, 16, 18, 20, 13, 59}, {0, 17, 14, 15, 16, 13, 12}};
-static short tonexquick [2] [7] = {{0, 102, 79, 19, 15, 106, 107}, {0, 18, 22, 23, 24, 25, 26}};
+static short tonexquick [2] [7] = {{0, 102, 85, 19, 15, 106, 107}, {0, 18, 42, 23, 24, 25, 26}};
 
 static const char* namequickamp [7]  {"", "Volume     : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Exp        : ", "Reverb on  :"};
-static const char*  namequicktone [7] {"", "GAIN       : ", "REVERB     : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
+static const char*  namequicktone [7] {"", "GAIN       : ", "REVERB typ : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
 static short leds [7] = {0,21,22,23,24,25,26};
 static short ledscolor [7] = {0,33,32,25,4,5,6};
 static short encvalmax1 [7] = {0,100, 127, 127, 127, 130, 130};
@@ -97,13 +97,32 @@ static short valmaxcc [57] = {0,
   127,127,127,127,140,127,
   127,130,127,127,140,
   127,127,127,127,140,127,
-  130,127,127,127,127,127,
+  130,9,127,127,127,127,
   127,127,127,127,127,127,127,
   61,149,300
 };
 
-static float affichevaltonex = 0;
-static const char* verbname[5] = {"SPRING1", "SPRING2", "SPRING3", " ROOM", "PLATE"};
+static const char* verbname[5] = {"SPRING1", "SPRING2", "SPRING3", "ROOM ", "PLATE"};
+
+void progChange(byte CC, int val, byte canal) {
+  MIDI.sendControlChange(0, CC, canal);
+  MIDI.sendProgramChange(val, canal);
+}
+
+void midiblabla(byte a, byte b, byte c) {
+      MIDI.sendControlChange(a, b, c);
+      /*(""); Serial.print("ToneX -> CC : "); Serial.print(a); Serial.print(" - Val : ");
+      Serial.print(b); Serial.print(" - Channel : "); Serial.println(c); */
+}
+
+void typereverb() {
+  if (params[id][count] >= 0 && params[id][count] < 2) {midiblabla(totalcc[0][count], 10, canal1);}
+  if (params[id][count] >= 2 && params[id][count] < 4) {midiblabla(totalcc[0][count], 20, canal1);}
+  if (params[id][count] >= 4 && params[id][count] < 6) {midiblabla(totalcc[0][count], 55, canal1);}
+  if (params[id][count] >= 6 && params[id][count] < 8) {midiblabla(totalcc[0][count], 85, canal1);}
+  if (params[id][count] >= 8 && params[id][count] < 10) {midiblabla(totalcc[0][count], 115, canal1);}
+  Serial.println(params[id][count]);
+}
 
 static float valminimax[2][57] = {
   {0,
@@ -126,15 +145,43 @@ static float valminimax[2][57] = {
     0,10,10,10,140,500,
     -100,130,10,51,140,
     600,3,5000,4000,140,100,
-    5,127,127,127,127,127,
+    0,5,127,127,127,127,
     127,127,127,127,127,127,127,
     61,150,300
   }
 };
 
-void echelledevaleur(){
-  affichevaltonex = (valminimax[1][count]-valminimax[0][count])*((params[id][count]/valmaxcc[count])+valminimax[0][count]);
-  affichevaltonex = floor(affichevaltonex*10)/10;
+float affichevaltonex, affichevaltonexneg;
+
+void echelledevaleur(byte val3){
+  affichevaltonex = (valminimax[1][count]-valminimax[0][count])*params[id][count]/valmaxcc[count]+valminimax[0][count];
+  switch (val3){
+  case 1 :
+    LCD.setCursor(12,1); LCD.print("    "); 
+    if (affichevaltonex >=0 && affichevaltonex < 10) {LCD.setCursor(13,1);}
+    if (affichevaltonex > 9 && affichevaltonex <= 100) {LCD.setCursor(12,1);}
+    if (affichevaltonex < 0 && affichevaltonex < -100) {LCD.setCursor(13,1);}
+    if (affichevaltonex < 0 && affichevaltonex >= -100) {LCD.setCursor(12,1);}
+    LCD.print((valminimax[1][count]-valminimax[0][count])*params[id][count]/valmaxcc[count]+valminimax[0][count]);
+  break;
+  case 2 :
+    LCD.setCursor(12,1); LCD.print("    "); 
+    if (affichevaltonex >=0 && affichevaltonex < 10) {LCD.setCursor(14,1);}
+    if (affichevaltonex >=0 && affichevaltonex > 9 && affichevaltonex < 100) {LCD.setCursor(13,1);}
+    if (affichevaltonex >=0 && affichevaltonex >= 100) {LCD.setCursor(12,1);}
+    LCD.print(round((valminimax[1][count]-valminimax[0][count])*params[id][count]/valmaxcc[count]+valminimax[0][count]));
+    LCD.setCursor(15,1); LCD.print("%"); 
+  break;
+  case 3 :
+    LCD.setCursor(9,1); LCD.print("       "); LCD.setCursor(9,1); 
+    if (params[id][count] >= 0 && params[id][count] < 2) {LCD.print(verbname[0]);}
+    if (params[id][count] >= 2 && params[id][count] < 4) {LCD.print(verbname[1]);}
+    if (params[id][count] >= 4 && params[id][count] < 6) {LCD.print(verbname[2]);}
+    if (params[id][count] >= 6 && params[id][count] < 8) {LCD.print(verbname[3]);}
+    if (params[id][count] >= 8 && params[id][count] < 10) {LCD.print(verbname[4]);}
+    Serial.println(params[id][count]);
+  break;
+  }
 }
 
 // ----------------------------------------------GESTTION BASE DE DONNEE
@@ -279,7 +326,16 @@ void Screens(byte choixscreen, int val2) {
             if (params[id][count] == 130) {LCD.print("ON "); val2 = 130;}
             else {LCD.print("OFF"); val2 = 129;}
         }
-        if (params[id][count] < 128) {LCD.print(params[id][count]); val2 = -1;} 
+        if (params[id][count] < 128) {          
+          if (count < 18) {LCD.print(params[id][count]);}
+          if (count > 17) {
+            if (valminimax[1][count] == 10) {echelledevaleur(1);}
+            if (count == 22 or count == 40 or count == 53) {echelledevaleur(2);}
+            if (count != 22 or count != 40 or count != 53 or valminimax[1][count] != 10 or count != 42) {LCD.print(params[id][count]);}
+            if (count == 42) {echelledevaleur(3);}
+          }
+          val2 = -1;
+        } 
       }
       if(count == 55) {LCD.print(progChang[id][0]); val2 = -1;}
       if(count == 56) {LCD.print(progChang[id][1]); val2 = -1;} 
@@ -341,17 +397,6 @@ void displayColor2(byte color) {
   digitalWrite(ledscolor[5], bitRead(color, 2));
   digitalWrite(ledscolor[4], bitRead(color, 1));
   digitalWrite(ledscolor[5], bitRead(color, 0));
-}
-
-void progChange(byte CC, int val, byte canal) {
-  MIDI.sendControlChange(0, CC, canal);
-  MIDI.sendProgramChange(val, canal);
-}
-
-void midiblabla(byte a, byte b, byte c) {
-      MIDI.sendControlChange(a, b, c);
-      /*(""); Serial.print("ToneX -> CC : "); Serial.print(a); Serial.print(" - Val : ");
-      Serial.print(b); Serial.print(" - Channel : "); Serial.println(c); */
 }
 
 void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
@@ -426,6 +471,13 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
         encoder2.setCount(pot);
         enc2last = pot;
     break;
+    case 2 :
+      pot = encoder2.getCount();
+      if (pot > valmaxi) {pot = valmaxi;}
+      if (pot < valmini) {pot = valmini;}
+      params[id][42] = pot;
+      typereverb();
+    break;
   }
 }
 
@@ -460,7 +512,8 @@ void commun(){
         if (progChang[id][1] > 255 && progChang[id][1] < 301 && count == 56){ampvalbk = 2;}
         tmp = -1; encvalMax = valmaxcc[count]; encvalMini = 0; 
       }
-    encod2(encvalMini,encvalMax,count,1);          
+    if (count != 42){encod2(encvalMini,encvalMax,count,1);}
+    if (count == 42){encod2(0,valmaxcc[count],count,2);}    
     Screens(1, tmp);
     }
     if (digitalRead(5) == 0) {
@@ -569,12 +622,13 @@ void choixprogchang(){
 
 void firstcharg(){
   progChange(tonevalbk, progChang[id][0], canal1);
-  delay(50);
+  delay(100);
   progChange(ampvalbk,  progChang[id][1], canal2);
-  delay(50);
+  delay(100);
   for (i = 18; i < params[id][54]; i++){
-      MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);
-  delay(50);
+      if (count != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
+      else {typereverb();}
+  delay(80);
   }
   for (i = 1; i < 18; i++){
       MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);
@@ -584,12 +638,13 @@ void firstcharg(){
 
 void chgtPedal() {
   if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1);}
-  delay(10);
+  delay(50);
   if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2);}
   delay(10);
   for (i = 18; i < params[id][54]; i++){
     if (params[id][i] != params[preid][i]) {
-      MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);
+      if (count != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
+      else {typereverb();}
   delay(10);
     }
   }
