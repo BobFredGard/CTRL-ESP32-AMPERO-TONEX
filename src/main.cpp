@@ -61,7 +61,7 @@ static short amperoquick [2] [7] = {{0, 7, 16, 18, 20, 13, 59}, {0, 17, 14, 15, 
 static short tonexquick [2] [7] = {{0, 102, 85, 19, 15, 106, 107}, {0, 18, 42, 23, 24, 25, 26}};
 
 static const char* namequickamp [7]  {"", "Volume     : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Exp        : ", "Reverb on  :"};
-static const char*  namequicktone [7] {"", "GAIN       : ", "REVERB typ : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
+static const char*  namequicktone [7] {"", "GAIN       : ", "REV TYPE   : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
 static short leds [7] = {0,21,22,23,24,25,26};
 static short ledscolor [7] = {0,33,32,25,4,5,6};
 static short encvalmax1 [7] = {0,100, 127, 127, 127, 130, 130};
@@ -179,7 +179,6 @@ void echelledevaleur(byte val3){
     if (params[id][count] >= 4 && params[id][count] < 6) {LCD.print(verbname[2]);}
     if (params[id][count] >= 6 && params[id][count] < 8) {LCD.print(verbname[3]);}
     if (params[id][count] >= 8 && params[id][count] < 10) {LCD.print(verbname[4]);}
-    Serial.println(params[id][count]);
   break;
   }
 }
@@ -375,7 +374,15 @@ void Screens(byte choixscreen, int val2) {
           if (val2 == 130) {LCD.print("ON "); val2 = 130;}
           else {LCD.print("OFF"); val2 = 129;}
         }
-        if (params[id][tonexquick[1][count2]] < 128) {LCD.print(params[id][tonexquick[1][count2]]); val2 = -1;}
+        if (params[id][tonexquick[1][count2]] < 128) {
+          count = tonexquick[1][count2];
+          LCD.print(params[id][count]);
+          if (valminimax[1][count] == 10) {echelledevaleur(1);}
+          if (count == 22 or count == 40 or count == 53) {echelledevaleur(2);}
+          if (count != 22 or count != 40 or count != 53 or valminimax[1][count] != 10 or count != 42) {LCD.print(params[id][count]);}
+          if (count == 42) {echelledevaleur(3);}
+          val2 = -1;
+        }
     break;
     case 10 :
       LCD.clear();
