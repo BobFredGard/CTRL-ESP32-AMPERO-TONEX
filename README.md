@@ -17,4 +17,4 @@ En ce qui concerne le PACER, il envoit des 'ProgramChange' et des 'ControlChange
 
 2 'ProgramChange' sont envoyés aux 2 appareils si besoin!!!
 
-Je donne un fichier Zip d'un circuit imprimé! Le code ne correspond pas exactement à ce circuit, mais il vous sera facile de l'adapter!!!
+Je donne un fichier Zip d'un circuit imprimé possible! Le code ne correspond pas exactement à ce circuit, mais il vous sera facile de l'adapter!!!
