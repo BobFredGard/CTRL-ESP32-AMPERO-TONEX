@@ -37,7 +37,7 @@ const byte COLOR_YELLOW = 0b110;
 const byte COLOR_WHITE = 0b111;*/
 //const byte rgbcolor [8] = {0b000, 0b100, 0b010, 0b001, 0b101, 0b011, 0b110, 0b111};
 
-int i = 0;
+int i, oldid = 0;
 static short choixbd, oldbank, menus = 0; 
 static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, canal1 = 1; static short canal2 = 2;
 static short preid = -1;
@@ -66,7 +66,7 @@ static short leds [7] = {0,21,22,23,24,25,26};
 static short ledscolor [7] = {0,33,32,25,4,5,6};
 static short encvalmax1 [7] = {0,100, 127, 127, 127, 130, 130};
 static short encvalmin1 [7] = {0,0, 0, 0, 0, 129, 129};
-static short encvalmax2 [7] = {0,100, 127, 127, 127, 127, 127};
+static short encvalmax2 [7] = {0,127, 9, 127, 127, 127, 127};
 static short encvalmin2 [7] = {0,0, 0, 0, 0, 0, 0};
 
 static short params[43][59]; static short paramsCopy[43][59];
@@ -74,7 +74,7 @@ static int progChang [43][2];
 
 static const char* texteline1;
 static const char* texteline2;
-String sql;
+static String sql;
 
 static const char* namescc[57] = {  "", 
   "Slot A1    : ", "Slot A2    : ", "Slot A3    : ", "Slot A4    : ", "Slot A5    : ", "Slot A6    : ",
@@ -159,7 +159,7 @@ void echelledevaleur(byte val3){
   case 1 :
     LCD.setCursor(12,1); LCD.print("    "); 
     if (affichevaltonex >=0 && affichevaltonex < 10) {LCD.setCursor(13,1);}
-    if (affichevaltonex > 9 && affichevaltonex <= 100) {LCD.setCursor(12,1);}
+    if (affichevaltonex > 9.99 && affichevaltonex <= 100) {LCD.setCursor(12,1);}
     if (affichevaltonex < 0 && affichevaltonex < -100) {LCD.setCursor(13,1);}
     if (affichevaltonex < 0 && affichevaltonex >= -100) {LCD.setCursor(12,1);}
     LCD.print((valminimax[1][count]-valminimax[0][count])*params[id][count]/valmaxcc[count]+valminimax[0][count]);
@@ -194,21 +194,21 @@ static int db_open(const char *filename, sqlite3 **db) {
 
 static int call(void *daTa, int argc, char **argv, char **azColName) {
   static int m;
-  for (m = 0; m<argc; m++){
-    String val = argv[m];
-    String val2 = azColName[m];
-    switch (choixbd){
-      case 0 :
-        if (m < 55) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
-        if (m == 55) {progChang[i][0] = val.toInt();}
-        if (m == 56) {progChang[i][1] = val.toInt();}
-        if (m > 56) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
-        //if (i==11){Serial.println(params[i][m]);}
-      break;
-      case 1 :
-      break;
-    }    
-  }
+    for (m = 0; m<argc; m++){
+      String val = argv[m];
+      //String val2 = azColName[m];
+      switch (choixbd){
+        case 0 :
+          //Serial.println("");Serial.print("m = ");Serial.println(m);
+          if (m < 55) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
+          if (m == 55) {progChang[i][0] = val.toInt();}
+          if (m == 56) {progChang[i][1] = val.toInt();}
+          if (m > 56) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
+        break;
+        case 1 :
+        break;
+      } 
+    }
   id = 1;
   return 0;
 }
@@ -234,22 +234,26 @@ void saveData() {
         sql += "'"+String(i)+"'="+String(progChang[id][1]); 
     }
   }
-  sql += " WHERE stomps_id="+String(id)+";";
+  if (bank == 1 ) {sql += " WHERE stomps_id="+String(id)+";";}
+  if (bank == 2 ) {sql += " WHERE stomps_id="+String(id+42)+";";}
+  if (bank == 3 ) {sql += " WHERE stomps_id="+String(id+84)+";";}
   db_exec(db_base, sql.c_str());
   sqlite3_close(db_base);
   Serial.println(sql);
 }
 
 void readData (){
+  choixbd = 0;
   if (db_open("/spiffs/base.db", &db_base)) return; 
   static byte o;
+  Serial.print("Bank = "); Serial.println(bank);
   if (bank == 1 ) {o = id;}
-  if (bank == 2 ) {o = id + 43;}
-  if (bank == 3 ) {o = id + 85;}
-  for (i = o; i < o + 42; i++) {
-    choixbd = 0;
-    sql = "SELECT * FROM stomps WHERE stomps_id = " + String(i) + ";";
+  if (bank == 2 ) {o = id + 42;}
+  if (bank == 3 ) {o = id + 84;}
+  for (i = 1; i < 43; i++) {
+    sql = "SELECT * FROM stomps WHERE stomps_id = " + String(o) + ";";
     db_exec(db_base, sql.c_str());
+    o = o + 1;
     //Serial.println(sql);
   }
   sqlite3_close(db_base);
@@ -376,13 +380,20 @@ void Screens(byte choixscreen, int val2) {
         }
         if (params[id][tonexquick[1][count2]] < 128) {
           count = tonexquick[1][count2];
-          LCD.print(params[id][count]);
+          //LCD.print(params[id][count]);
           if (valminimax[1][count] == 10) {echelledevaleur(1);}
           if (count == 22 or count == 40 or count == 53) {echelledevaleur(2);}
           if (count != 22 or count != 40 or count != 53 or valminimax[1][count] != 10 or count != 42) {LCD.print(params[id][count]);}
           if (count == 42) {echelledevaleur(3);}
           val2 = -1;
         }
+    break;
+    case 9 :
+      LCD.clear();
+      LCD.setCursor(0,0);
+      LCD.print("** CHARGEMENT **");
+      LCD.setCursor(0,1);
+      LCD.print("***** BANK *****");
     break;
     case 10 :
       LCD.clear();
@@ -392,6 +403,7 @@ void Screens(byte choixscreen, int val2) {
       LCD.print("*** EN COURS ***");
     break;
   }
+  oldid = id;
 }
 
 void displayColor1(byte color) {
@@ -665,20 +677,20 @@ void chgtPedal() {
 }
 
 void selectBank() {
-  if (id < 43) {bank = 1;}
-  if (id > 42 && id < 85) {bank = 2;}
-  if (id > 84 && id < 127) {bank = 3;}
   choixprogchang();
   if (startcharg == 1) {readData(); choixprogchang(); firstcharg(); oldbank = bank;}
-  if (bank != oldbank) {readData(); oldbank = bank;}
+  if (bank != oldbank) {Screens(9, 0); readData(); oldbank = bank; texteline1 = "toto"; texteline2 = "toto"; Screens(2, 0);}
 }
 
 void handleControlChange(byte channel, byte number, byte value) {
+  if (channel == 12){bank = value;}
+  Serial.print("Bank = ");Serial.println(bank);
   if (channel == 16) {
     preid = id; 
     id_init = value; id = value;
     count1 = 0; count2 = 0; menus = 0;
-    selectBank(); chgtPedal();
+    selectBank(); 
+    chgtPedal();
     BoutRot(1, menus);
     Screens(2, 0);
   }
@@ -687,7 +699,8 @@ void handleControlChange(byte channel, byte number, byte value) {
     preid = id; 
     id = id_init + value;
     count1 = 0; count2 = 0; menus = 0;
-    selectBank(); chgtPedal();
+    //selectBank(); 
+    chgtPedal();
     BoutRot(1, menus);
     Screens(2, 0);
   }
@@ -720,7 +733,7 @@ void setup() {
   MIDI.setHandleControlChange(handleControlChange);
 
   if(SPIFFS.begin(true)){
-    File root = SPIFFS.open("/"); id = 1, startcharg = 1; selectBank(); preid = 1;}
+    File root = SPIFFS.open("/"); bank = 1; id = 1, startcharg = 1; selectBank(); preid = 1;}
   else {Serial.println("SPIFFS marche pas");} 
 
   ESP32Encoder::useInternalWeakPullResistors=NONE;
