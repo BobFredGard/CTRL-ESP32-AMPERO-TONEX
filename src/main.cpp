@@ -45,9 +45,9 @@ const byte COLOR_YELLOW = 0b110;
 const byte COLOR_WHITE = 0b111;*/
 //const byte rgbcolor [8] = {0b000, 0b100, 0b010, 0b001, 0b101, 0b011, 0b110, 0b111};
 
-int i, oldid = 0;
+static int i, oldid, j, k, l = 0;
 static short choixbd, oldbank, menus = 0; 
-static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, canal1 = 1; static short canal2 = 2;
+static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, canal1, btn, cp1, cp2,idcopy = 1; static short canal2 = 2;
 static short preid = -1;
 static int ampvalbk, tonevalbk = 0;
 
@@ -77,7 +77,7 @@ static short encvalmin1 [7] = {0,0, 0, 0, 0, 129, 129};
 static short encvalmax2 [7] = {0,127, 127, 127, 127, 127, 127};
 static short encvalmin2 [7] = {0,0, 0, 0, 0, 0, 0};
 
-static short params[43][59]; static short paramsCopy[43][59];
+static short params[43][60]; static short paramsCopy[43][60];  static short Copytemp[60];
 static int progChang [43][2]; 
 
 static const char* texteline1;
@@ -109,6 +109,8 @@ static short valmaxcc [57] = {0,
   127,127,127,127,127,127,127,
   61,149,300
 };
+
+static int idcopyplus [19] = {0,1,8,15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,120};
 
 static const char* verbname[5] = {"SPRING1", "SPRING2", "SPRING3", "ROOM ", "PLATE"};
 
@@ -231,20 +233,48 @@ void saveData() {
   sql = "UPDATE stomps SET ";
   for (i = 1; i < 57; i++){
     if (i < 55){
-      if (params[id][i] != paramsCopy[id][i]) {
-        sql += "'"+String(i)+"'="+String(params[id][i])+", "; 
+      if (params[idcopy][i] != paramsCopy[idcopy][i]) {
+        sql += "'"+String(i)+"'="+String(params[idcopy][i])+", "; 
       }
     }
     if (i == 55){
-        sql += "'"+String(i)+"'="+String(progChang[id][0])+", "; 
+        sql += "'"+String(i)+"'="+String(progChang[idcopy][0])+", "; 
     }
     if (i == 56){
-        sql += "'"+String(i)+"'="+String(progChang[id][1]); 
+        sql += "'"+String(i)+"'="+String(progChang[idcopy][1]); 
     }
   }
-  if (bank == 1 ) {sql += " WHERE stomps_id="+String(id)+";";}
-  if (bank == 2 ) {sql += " WHERE stomps_id="+String(id+42)+";";}
-  if (bank == 3 ) {sql += " WHERE stomps_id="+String(id+84)+";";}
+  if (bank == 1 ) {sql += " WHERE stomps_id="+String(idcopy)+";";}
+  if (bank == 2 ) {sql += " WHERE stomps_id="+String(idcopy+42)+";";}
+  if (bank == 3 ) {sql += " WHERE stomps_id="+String(idcopy+84)+";";}
+  db_exec(db_base, sql.c_str());
+  sqlite3_close(db_base);
+  Serial.println(sql);
+}
+
+void saveDataCopy() {
+  if (db_open("/spiffs/base.db", &db_base)) return;
+  sql = "UPDATE stomps SET ";
+  for (i = 1; i < 60; i++){
+    if (i < 58){
+      sql += "'"+String(i)+"'="+String(Copytemp[i])+", "; 
+    }
+    if (i == 58){
+      sql += "'"+String(i)+"'="+String(Copytemp[i]); 
+    }
+  }
+  sql += " WHERE stomps_id="+String(idcopy)+";";
+  db_exec(db_base, sql.c_str());
+  sqlite3_close(db_base);
+  Serial.println(sql);
+}
+
+void saveDataPC() {
+  if (db_open("/spiffs/base.db", &db_base)) return;
+  sql = "UPDATE stomps SET ";
+  sql += "'"+String(55)+"'="+String(progChang[id][0])+", "; progChang[idcopy][0] = progChang[id][0];
+  sql += "'"+String(56)+"'="+String(progChang[id][1]);  progChang[idcopy][1] = progChang[id][1];
+  sql += " WHERE stomps_id="+String(idcopy)+";";
   db_exec(db_base, sql.c_str());
   sqlite3_close(db_base);
   Serial.println(sql);
@@ -295,6 +325,14 @@ void initEncoder(int val1) {
     break;
     case 6 :
       encoder2.setCount(params[id][count]); enc2last = params[id][count];
+    break;
+    case 7 :
+    cp1 = 1;
+    cp2 = 2;
+      encoder1.setCount(cp1);
+      enc1last = cp1;
+      encoder2.setCount(cp2);
+      enc2last = cp2;
     break;
   }
 }
@@ -396,6 +434,23 @@ void Screens(byte choixscreen, int val2) {
           val2 = -1;
         }
     break;
+    case 6 :
+      LCD.clear();
+      LCD.setCursor(0,0);
+      LCD.print(" Copy Pacth : ");
+      LCD.setCursor(0,1);
+      LCD.print("...To Patch : ");
+    break;
+    case 7 :
+      LCD.setCursor(14,0);
+      LCD.print(cp1);
+      if (cp1 < 10) {LCD.setCursor(15,0); LCD.print(" ");}
+    break;
+    case 8 :
+      LCD.setCursor(14,1);
+      LCD.print(cp2);
+      if (cp2 < 10) {LCD.setCursor(15,1); LCD.print(" ");}
+    break;
     case 9 :
       LCD.clear();
       LCD.setCursor(0,0);
@@ -409,6 +464,27 @@ void Screens(byte choixscreen, int val2) {
       LCD.print("** SAUVEGARDE **");
       LCD.setCursor(0,1);
       LCD.print("*** EN COURS ***");
+    break;
+    case 11 :
+      LCD.clear();
+      LCD.setCursor(0,0);
+      LCD.print("****  COPY  ****");
+      LCD.setCursor(0,1);
+      LCD.print("*** EN COURS ***");
+    break;
+    case 12 :
+      LCD.clear();
+      LCD.setCursor(0,0);
+      LCD.print("????  COPY  ????");
+      LCD.setCursor(0,1);
+      LCD.print("Progs AMP/TONE-X");
+    break;
+    case 13 :
+      LCD.clear();
+      LCD.setCursor(0,0);
+      LCD.print("****  COPY  ****");
+      LCD.setCursor(0,1);
+      LCD.print("Progs AMP/TONE-X");
     break;
   }
   oldid = id;
@@ -446,6 +522,15 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
       encoder1.setCount(pot);
       enc1last = pot;
       Screens(1, params[id][count]);
+    break;
+    case 2 :
+      pot = encoder1.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      cp1 = pot;
+      encoder1.setCount(pot);
+      enc1last = pot;
+      Screens(7, cp1);
     break;
   }
 }
@@ -507,6 +592,15 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
       enc2last = pot;
       typereverb();
     break;
+    case 3 :
+      pot = encoder2.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      cp2 = pot;
+      encoder2.setCount(pot);
+      enc2last = pot;
+      Screens(8, cp2);
+    break;
   }
 }
 
@@ -549,6 +643,7 @@ void commun(){
       delay(250);
       if (digitalRead(23) == 0) {
         Screens(10, 0);
+        idcopy = id;
         saveData(); delay(250);
         count1 = 0; count2 = 0; 
         if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
@@ -560,6 +655,7 @@ void commun(){
       delay(250);
       if (digitalRead(5) == 0) {
         Screens(10, 0);
+        idcopy = id;
         saveData(); delay(250);
         count1 = 0; count2 = 0; 
         if(count<18) {startcharg = 2;} else{startcharg = 3;} break;
@@ -639,6 +735,76 @@ void BoutRot(byte choixrot, byte menu) {
         break;
       }
     break;
+  }
+}
+
+void SavePatch(){
+  Screens(11,0);
+  //int j, k, l;
+  l = idcopyplus[cp1];
+  k = idcopyplus[cp2];
+  for (k ; k < idcopyplus[cp2]+7; k++ && l++) {
+    for (j = 1; j < 60; j++){
+      if (j != 55 or j != 56){
+        if (k < id_init + 43)  {
+          params[k][j] = params[l][j];
+          paramsCopy[k][j] = paramsCopy[l][j];
+          Copytemp[j] = params[l][j];
+        }
+        if (k > id_init + 42) {Copytemp[j] = params[l][j];}
+      }
+      if (j == 55){Copytemp[j] = progChang[l][0];}
+      if (j == 56){Copytemp[j] = progChang[l][1];}
+    }
+    Serial.println("");Serial.print(" ID = ");Serial.println(l);
+    idcopy = k;
+    saveDataCopy();
+    delay(50);
+  }
+}
+
+void CopyPatch(){
+  byte tmp = 1;
+  initEncoder(7);
+  while (menus == 2){
+    if (tmp == 1) {Screens(6, 0); Screens(7,0); Screens(8,0); tmp = 0;}
+    if (enc1last != encoder1.getCount()) {encod1(1,18,cp1,2);} 
+    if (enc2last != encoder2.getCount()) {encod2(1,18,cp2,3);} 
+    if (digitalRead(5) == 0) {
+      delay(250);
+      if (digitalRead(23) == 0) {SavePatch();}
+      count1 = 0; count2 = 0;
+      startcharg = 2;
+      break;
+    }
+    if (digitalRead(23) == 0) {
+      delay(250);
+      if (digitalRead(5) == 0) {SavePatch();}
+      count1 = 0; count2 = 0; 
+      startcharg = 3;
+      break;
+    }
+  }
+}
+
+void CopyPC(){
+  byte tmp = 1;
+  while (menus == 2){
+    if (tmp == 1) {Screens(12, 0);tmp = 0;}
+    if (digitalRead(5) == 0) {
+      delay(250);
+      if (digitalRead(23) == 0) {Screens(13, 0); for (j = id+1; j < id+7; j++) {idcopy = j; saveDataPC();}}
+      count1 = 0; count2 = 0;
+      startcharg = 2;
+      break;
+    }
+    if (digitalRead(23) == 0) {
+      delay(250);
+      if (digitalRead(5) == 0) {Screens(13, 0); for (j = id+1; j < id+7; j++) {idcopy = j; saveDataPC();}}
+      count1 = 0; count2 = 0; 
+      startcharg = 3;
+      break;
+    }
   }
 }
 
@@ -750,11 +916,15 @@ void setup() {
   button7.setPressTicks(500);
   button8.setPressTicks(500);
 
-  button7.attachClick([] () {if(menus == 0) {BoutRot(1, menus);}});
-  button8.attachClick([] () {if(menus == 0) {BoutRot(2, menus);}});
+  button7.attachClick([] () {if(menus == 0) {btn = 1; BoutRot(1, menus);}});
+  button8.attachClick([] () {if(menus == 0) {btn = 2; BoutRot(2, menus);}});
 
-  button7.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(1, menus);});
-  button8.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; BoutRot(2, menus);});
+  button7.attachLongPressStop([] () {texteline2 = "toto"; menus, btn = 1; BoutRot(1, menus);});
+  button8.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; btn = 2; BoutRot(2, menus);});
+
+  button7.attachDoubleClick([] () {texteline2, texteline1 = "toto"; menus = 2; CopyPC();});
+  button8.attachDoubleClick([] () {texteline2, texteline1 = "toto"; menus = 2; CopyPatch();});
+
 
   MIDI.begin(MIDI_CHANNEL_OMNI);  
   MIDI.setHandleControlChange(handleControlChange);
