@@ -19,8 +19,16 @@ ESP32Encoder encoder1;
 ESP32Encoder encoder2;
 static int enc1last, enc2last;
 
+struct Serial2MIDISettings
+{
+  static const long BaudRate = 31250;
+  static const int8_t RxPin  = 16;
+  static const int8_t TxPin  = 17;
+};
+
 #include <midi.h>
-MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, MIDI);
+//MIDI_CREATE_INSTANCE(HardwareSerial, Serial2, MIDI);
+MIDI_CREATE_CUSTOM_INSTANCE(HardwareSerial, Serial2, MIDI, Serial2MIDISettings);
 #define MIDI_CHANNEL_OMNI 0
 
 #include <Wire.h>
@@ -50,23 +58,23 @@ static int ampvalbk, tonevalbk = 0;
 //static byte MIDIPC[17] = {0, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207};
 
 static short totalcc [2][54] =  {
-  //  |------CC------>>> AMPERO II STOMPS <<<-------CC---------| |------------CC------------>>> TONE X <<<--------------------------CC---------------------------------------------------------------------------------------------|
+  //  |------CC------>>> AMPERO II STOMPS <<<-------CC-----------------| |------------CC------------>>> TONE X <<<--------------------------CC---------------------------------------------------------------------------------------------|
   {0, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 13, 16, 18, 20, 7, 102, 23, 25, 28, 79, 19, 15, 106, 107, 103, 14, 16, 17, 18, 20, 21, 22, 24, 26, 27, 29, 30, 104, 75, 85, 76, 77, 78, 108, 109, 110, 111, 112, 113, 114, 115},
   {0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,  25,  26,  27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39,  40, 41, 42, 43, 45, 45,  46,  47,  48,  49,  50,  51,  52,  53}
   //  Numéro colonne de la base de donnée
 };
 
                                    //  |--------CC----------|      |--Positions dans BD--|
-static short amperoquick [2] [7] = {{0, 7, 16, 18, 20, 13, 59}, {0, 17, 14, 15, 16, 13, 12}};
-static short tonexquick [2] [7] = {{0, 102, 85, 19, 15, 106, 107}, {0, 18, 42, 23, 24, 25, 26}};
+static short amperoquick [2] [7] = {{-10, 7, 16, 18, 20, 13, 59}, {0, 17, 14, 15, 16, 13, 12}};
+static short tonexquick [2] [7] = {{-10, 103, 102, 19, 15, 106, 107}, {0, 27, 18, 23, 24, 25, 26}};
 
 static const char* namequickamp [7]  {"", "Volume     : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Exp        : ", "Reverb on  :"};
-static const char*  namequicktone [7] {"", "GAIN       : ", "REV TYPE   : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
+static const char*  namequicktone [7] {"", "MODEL.VOL  : ", "GAIN       : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
 static short leds [7] = {0,21,22,23,24,25,26};
 static short ledscolor [7] = {0,33,32,25,4,5,6};
 static short encvalmax1 [7] = {0,100, 127, 127, 127, 130, 130};
 static short encvalmin1 [7] = {0,0, 0, 0, 0, 129, 129};
-static short encvalmax2 [7] = {0,127, 9, 127, 127, 127, 127};
+static short encvalmax2 [7] = {0,127, 127, 127, 127, 127, 127};
 static short encvalmin2 [7] = {0,0, 0, 0, 0, 0, 0};
 
 static short params[43][59]; static short paramsCopy[43][59];
@@ -266,8 +274,8 @@ void initEncoder(int val1) {
     case 1 :
       encoder1.setCount(params[id][amperoquick[1][count1]]);
       enc1last = params[id][amperoquick[1][count1]];
-      encoder2.setCount(params[id] [tonexquick[1][count2]]);
-      enc2last = params[id] [tonexquick[1][count2]];
+      encoder2.setCount(params[id][tonexquick[1][count2]]);
+      enc2last = params[id][tonexquick[1][count2]];
     break;
     case 2 :
       encoder1.setCount(count);
@@ -421,23 +429,23 @@ void displayColor2(byte color) {
 void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
   switch (sel) {
     case 0 :
-        pot = encoder1.getCount();
-        if (pot > valmaxi) {pot = valmaxi;}
-        if (pot < valmini) {pot = valmini;}
-        midiblabla(amperoquick[0][count1], pot, canal2);
-        params[id][amperoquick[1][count1]] = pot;
-        encoder1.setCount(pot);
-        enc1last = pot;
-        Screens(2, params[id][amperoquick[1][count1]]);
+      pot = encoder1.getCount();
+      if (pot > valmaxi) {pot = valmaxi;}
+      if (pot < valmini) {pot = valmini;}
+      midiblabla(amperoquick[0][count1], pot, canal2);
+      params[id][amperoquick[1][count1]] = pot;
+      encoder1.setCount(pot);
+      enc1last = pot;
+      Screens(2, params[id][amperoquick[1][count1]]);
     break;
     case 1 :
-        pot = encoder1.getCount();
-        if (pot > valmaxi) {pot = valmini;}
-        if (pot < valmini) {pot = valmaxi;}        
-        count = pot;
-        encoder1.setCount(pot);
-        enc1last = pot;
-        Screens(1, params[id][count]);
+      pot = encoder1.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      count = pot;
+      encoder1.setCount(pot);
+      enc1last = pot;
+      Screens(1, params[id][count]);
     break;
   }
 }
@@ -445,56 +453,58 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
 void encod2(int valmini, int valmaxi, int pot, byte sel){
   switch (sel) {
     case 0 :
-        pot = encoder2.getCount();
-        if (pot > valmaxi) {pot = valmaxi;}
-        if (pot < valmini) {pot = valmini;}
-        midiblabla(tonexquick[0][count2], pot, canal1);
-        params[id][tonexquick[1][count2]] = pot;
-        encoder2.setCount(pot);
-        enc2last = pot;
-        Screens(3, params[id][tonexquick[1][count2]]);
+      pot = encoder2.getCount();
+      if (pot > valmaxi) {pot = valmaxi;}
+      if (pot < valmini) {pot = valmini;}
+      midiblabla(tonexquick[0][count2], pot, canal1);
+      Screens(3, pot);
+      params[id][tonexquick[1][count2]] = pot;
+      encoder2.setCount(pot);
+      enc2last = pot;
     break;
     case 1 :
-        pot = encoder2.getCount();
-        if (pot > valmaxi) {pot = valmaxi;}
-        if (pot < valmini) {pot = valmini;}
-        if (count == 55) {
-          progChange(tonevalbk, pot, canal1);
-          progChang[id][0] = pot;
+      pot = encoder2.getCount();
+      if (pot > valmaxi) {pot = valmaxi;}
+      if (pot < valmini) {pot = valmini;}
+      if (count == 55) {
+        progChange(tonevalbk, pot, canal1);
+        progChang[id][0] = pot;
+      }
+      if (count == 56) {
+        progChange(ampvalbk, pot, canal2);
+        progChang[id][1] = pot;
         }
-        if (count == 56) {
-          progChange(ampvalbk, pot, canal2);
-          progChang[id][1] = pot;
+      if (count != 55 or count != 56){
+        params[id][count] = pot;
+        if (params[id][count] == 139 or params[id][count] == 140){
+          if (params[id][count] == 139){midiblabla(totalcc[0][count], 0, canal1);}
+          else {midiblabla(totalcc[0][count], 127, canal1);}
+        }
+        if (count > 17 && count < params[id][54]) {
+          if (params[id][count] == 129){midiblabla(totalcc[0][count], 0, canal1);}
+          if (params[id][count] == 130){midiblabla(totalcc[0][count], 127, canal1);}
+          if (params[id][count] < 128){
+            midiblabla(totalcc[0][count], pot, canal1);
           }
-        if (count != 55 or count != 56){
-          params[id][count] = pot;
-          if (params[id][count] == 139 or params[id][count] == 140){
-            if (params[id][count] == 139){midiblabla(totalcc[0][count], 0, canal1);}
-            else {midiblabla(totalcc[0][count], 127, canal1);}
+        }
+        if (count > 0 && count < 18) {
+          if (params[id][count] == 129){midiblabla(totalcc[0][count], 0, canal2);}
+          if (params[id][count] == 130){midiblabla(totalcc[0][count], 127, canal2);}
+          if (params[id][count] < 128){
+            midiblabla(totalcc[0][count], pot, canal2);
           }
-          if (count > 17 && count < params[id][54]) {
-            if (params[id][count] == 129){midiblabla(totalcc[0][count], 0, canal1);}
-            if (params[id][count] == 130){midiblabla(totalcc[0][count], 127, canal1);}
-            if (params[id][count] < 128){
-              midiblabla(totalcc[0][count], pot, canal1);
-            }
-          }
-          if (count > 0 && count < 18) {
-            if (params[id][count] == 129){midiblabla(totalcc[0][count], 0, canal2);}
-            if (params[id][count] == 130){midiblabla(totalcc[0][count], 127, canal2);}
-            if (params[id][count] < 128){
-              midiblabla(totalcc[0][count], pot, canal2);
-            }
-          }
-        }        
-        encoder2.setCount(pot);
-        enc2last = pot;
+        }
+      }        
+      encoder2.setCount(pot);
+      enc2last = pot;
     break;
     case 2 :
       pot = encoder2.getCount();
       if (pot > valmaxi) {pot = valmaxi;}
       if (pot < valmini) {pot = valmini;}
       params[id][42] = pot;
+      encoder2.setCount(pot);
+      enc2last = pot;
       typereverb();
     break;
   }
@@ -570,10 +580,10 @@ void BoutRot(byte choixrot, byte menu) {
           }
           else {
             if (startcharg == 1){count1 = 0; startcharg = 0;}
-            if (count1 >= 0 &&  count1 < 6) {
+            if (count1 > 0 && count1 < 6) {
               count1 = count1+1;
             }
-            else {count1 = 1;}
+            else {count1 = 1; count2 = 1;}
             initEncoder(1);
             byte tmp;
             if (params[id][amperoquick[1][count1]] > 135){
@@ -604,10 +614,10 @@ void BoutRot(byte choixrot, byte menu) {
           }
           else {
             if (startcharg == 1){count2 = 0; startcharg = 0;}
-            if (count2 >= 0 &&  count2 < 6) {
+            if (count2 > 0 && count2 < 6) {
               count2 = count2+1;
             }
-            else {count2 = 1;}
+            else {count2 = 1; count1 = 1;}
             initEncoder(1);
             static byte tmp;
             if (params[id][tonexquick[1][count2]] > 135){
@@ -645,35 +655,51 @@ void firstcharg(){
   progChange(ampvalbk,  progChang[id][1], canal2);
   delay(100);
   for (i = 18; i < params[id][54]; i++){
-      if (count != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
-      else {typereverb();}
-  delay(80);
+    if (params[id][i] == 139) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+    if (params[id][i] == 140) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+    if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+    if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+    if (i == 42) {typereverb();}
+    else {if (params[id][i] < 118) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}}
+    delay(5);
   }
   for (i = 1; i < 18; i++){
-      MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);
-  delay(50);
+    if (i < 14) {
+      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
+      else {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
+    if (i > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
+    delay(5);
+    }
   }
 }
 
 void chgtPedal() {
   if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1);}
-  delay(50);
+  delay(20);
   if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2);}
-  delay(10);
+  delay(20);
   for (i = 18; i < params[id][54]; i++){
     if (params[id][i] != params[preid][i]) {
-      if (count != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
+      if (i != 42) {
+        if (params[id][i] == 139) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+        if (params[id][i] == 140) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+        if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+        if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+        if (params[id][i] < 118) {
+          MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);
+        }
+      }
       else {typereverb();}
   delay(10);
     }
   }
   for (i = 1; i < 18; i++){
     if (params[id][i] != params[preid][i]) {
-      MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);
+      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
+      if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
+      if (count1 > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
     }
   }
-  //mcp.digitalWrite(leds[id], HIGH);
-  //mcp.digitalWrite(leds[id], LOW);
 }
 
 void selectBank() {
@@ -717,6 +743,7 @@ void setup() {
   Screens(0, 0);
   
   Serial.begin(115200);
+  //Serial2.begin(9600);
 
   Wire.begin(22, 21);
 
@@ -765,11 +792,11 @@ void loop(){
   }  
   if (enc2last != encoder2.getCount()) {
     if (count2 == 0) {count2 = 1;}
-    encod2(encvalmin2[count2],encvalmax2[count2],params[id] [tonexquick[1][count2]],0);
+    if (count2 != 0) {encod2(encvalmin2[count2],encvalmax2[count2],params[id][tonexquick[1][count2]],0);}
     texteline2, texteline1 = "toto";
   }
   MIDI.read();
-  if (startcharg == 2) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(1, menus); Screens(2, 0);}  
-  if (startcharg == 3) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(2, menus); Screens(3, 0);}
+  if (startcharg == 2) {startcharg = 0; menus = 0; texteline1, texteline2 = "toto"; BoutRot(1, menus); Screens(2, 0);}  
+  if (startcharg == 3) {startcharg = 0; menus = 0; texteline1, texteline2 = "toto"; BoutRot(2, menus); Screens(3, 0);}
 }
 
