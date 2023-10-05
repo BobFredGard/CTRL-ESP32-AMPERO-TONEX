@@ -47,7 +47,7 @@ const byte COLOR_WHITE = 0b111;*/
 
 static int i, oldid, j, k, l = 0;
 static short choixbd, oldbank, menus = 0; 
-static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, canal1, btn, cp1, cp2,idcopy = 1; static short canal2 = 2;
+static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, btn, cp1, cp2,idcopy = 1; static short canal2 = 2; static short canal1 = 3;
 static short preid = -1;
 static int ampvalbk, tonevalbk = 0;
 
@@ -68,7 +68,7 @@ static short totalcc [2][54] =  {
 static short amperoquick [2] [7] = {{-10, 7, 16, 18, 20, 13, 59}, {0, 17, 14, 15, 16, 13, 12}};
 static short tonexquick [2] [7] = {{-10, 103, 102, 19, 15, 106, 107}, {0, 27, 18, 23, 24, 25, 26}};
 
-static const char* namequickamp [7]  {"", "Volume     : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Exp        : ", "Reverb on  :"};
+static const char* namequickamp [7]  {"", "VOLUME     : ", "VOL TONE_X : ", "PEDAL POST : ", "VOL REVERB : ", "PEDAL EXP  : ", "REVERB ON  : "};
 static const char*  namequicktone [7] {"", "MODEL.VOL  : ", "GAIN       : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
 static short leds [7] = {0,21,22,23,24,25,26};
 static short ledscolor [7] = {0,33,32,25,4,5,6};
@@ -85,9 +85,9 @@ static const char* texteline2;
 static String sql;
 
 static const char* namescc[57] = {  "", 
-  "Slot A1    : ", "Slot A2    : ", "Slot A3    : ", "Slot A4    : ", "Slot A5    : ", "Slot A6    : ",
-  "Slot B1    : ", "Slot B2    : ", "Slot B3    : ", "Slot B4    : ", "Slot B5    : ", "Slot B6    : ",
-  "Exp Pedal  : ", "Param 1    : ", "Param 2    : ", "Param 3    : ", "Volume     : ",
+  "SLOT A1    : ", "SLOT A2    : ", "SLOT A3    : ", "SLOT A4    : ", "SLOT A5    : ", "SLOT A6    : ",
+  "SLOT B1    : ", "SLOT B2    : ", "SLOT B3    : ", "SLOT B4    : ", "SLOT B5    : ", "SLOT B6    : ",
+  "PEDAL EXP  : ", "VOL TONE_X : ", "PEDAL POST : ", "VOL REVERB : ", "VOLUME     : ",
   "GAIN       : ", "BASS       : ", "MID        : ", "TREBLE     : ", "REVERB     : ", "COMPRESSOR : ",
   "NOISE GATE : ", "PRESENCE   : ", "DEPTH      : ", "MODEL.VOL  : ", "NOISE GT   : ", "NG REL     : ",
   "NG DPTH    : ", "COMP       : ", "CMP GAIN   : ", "COMP ATK   : ", "COMP PATC  : ",
@@ -126,12 +126,12 @@ void midiblabla(byte a, byte b, byte c) {
 }
 
 void typereverb() {
-  if (params[id][count] >= 0 && params[id][count] < 2) {midiblabla(totalcc[0][count], 10, canal1);}
-  if (params[id][count] >= 2 && params[id][count] < 4) {midiblabla(totalcc[0][count], 20, canal1);}
-  if (params[id][count] >= 4 && params[id][count] < 6) {midiblabla(totalcc[0][count], 55, canal1);}
-  if (params[id][count] >= 6 && params[id][count] < 8) {midiblabla(totalcc[0][count], 85, canal1);}
-  if (params[id][count] >= 8 && params[id][count] < 10) {midiblabla(totalcc[0][count], 115, canal1);}
-  Serial.println(params[id][count]);
+  if (params[id][42] >= 0 && params[id][42] < 2) {midiblabla(totalcc[0][42], 10, canal1);}
+  if (params[id][42] >= 2 && params[id][42] < 4) {midiblabla(totalcc[0][42], 20, canal1);}
+  if (params[id][42] >= 4 && params[id][42] < 6) {midiblabla(totalcc[0][42], 55, canal1);}
+  if (params[id][42] >= 6 && params[id][42] < 8) {midiblabla(totalcc[0][42], 85, canal1);}
+  if (params[id][42] >= 8 && params[id][42] < 10) {midiblabla(totalcc[0][42], 115, canal1);}
+  //Serial.println(42);
 }
 
 static float valminimax[2][57] = {
@@ -209,11 +209,11 @@ static int call(void *daTa, int argc, char **argv, char **azColName) {
       //String val2 = azColName[m];
       switch (choixbd){
         case 0 :
-          //Serial.println("");Serial.print("m = ");Serial.println(m);
           if (m < 55) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
           if (m == 55) {progChang[i][0] = val.toInt();}
           if (m == 56) {progChang[i][1] = val.toInt();}
           if (m > 56) {params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();}
+          //Serial.println("");Serial.print("Val = ");Serial.println(params[i][m]);
         break;
         case 1 :
         break;
@@ -233,9 +233,9 @@ void saveData() {
   sql = "UPDATE stomps SET ";
   for (i = 1; i < 57; i++){
     if (i < 55){
-      if (params[idcopy][i] != paramsCopy[idcopy][i]) {
+      //if (params[idcopy][i] != paramsCopy[idcopy][i]) {
         sql += "'"+String(i)+"'="+String(params[idcopy][i])+", "; 
-      }
+      //}
     }
     if (i == 55){
         sql += "'"+String(i)+"'="+String(progChang[idcopy][0])+", "; 
@@ -269,6 +269,26 @@ void saveDataCopy() {
   Serial.println(sql);
 }
 
+void saveDataScene() {
+  if (db_open("/spiffs/base.db", &db_base)) return;
+  sql = "UPDATE stomps SET ";
+  for (i = 1; i < 54; i++){
+    if (i < 54){
+      sql += "'"+String(i)+"'="+String(params[id_init][i])+", "; 
+    }
+    if (i == 55){
+        sql += "'"+String(i)+"'="+String(progChang[id_init][0])+", "; 
+    }
+    if (i == 56){
+        sql += "'"+String(i)+"'="+String(progChang[id_init][1]); 
+    }
+  }
+  sql += " WHERE stomps_id="+String(idcopy)+";";
+  db_exec(db_base, sql.c_str());
+  sqlite3_close(db_base);
+  Serial.println(sql);
+}
+
 void saveDataPC() {
   if (db_open("/spiffs/base.db", &db_base)) return;
   sql = "UPDATE stomps SET ";
@@ -284,7 +304,7 @@ void readData (){
   choixbd = 0;
   if (db_open("/spiffs/base.db", &db_base)) return; 
   static byte o;
-  Serial.print("Bank = "); Serial.println(bank);
+  //Serial.print("Bank = "); Serial.println(bank);
   if (bank == 1 ) {o = id;}
   if (bank == 2 ) {o = id + 42;}
   if (bank == 3 ) {o = id + 84;}
@@ -294,7 +314,7 @@ void readData (){
     o = o + 1;
     //Serial.println(sql);
   }
-  sqlite3_close(db_base);
+  //sqlite3_close(db_base);
 }
 // ------------------------------------------FIN GESTTION BASE DE DONNEE
 
@@ -508,8 +528,14 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
       pot = encoder1.getCount();
       if (pot > valmaxi) {pot = valmaxi;}
       if (pot < valmini) {pot = valmini;}
-      midiblabla(amperoquick[0][count1], pot, canal2);
-      params[id][amperoquick[1][count1]] = pot;
+      if ( count1 < 5 ) {
+        midiblabla(amperoquick[0][count1], pot, canal2); params[id][amperoquick[1][count1]] = pot;
+      }
+      else {
+        if (pot == 129) {midiblabla(amperoquick[0][count1], 0, canal2); params[id][amperoquick[1][count1]] = pot;}
+        if (pot == 130) {midiblabla(amperoquick[0][count1], 127, canal2); params[id][amperoquick[1][count1]] = pot;}
+        Serial.println(pot);
+      }
       encoder1.setCount(pot);
       enc1last = pot;
       Screens(2, params[id][amperoquick[1][count1]]);
@@ -746,17 +772,17 @@ void SavePatch(){
   for (k ; k < idcopyplus[cp2]+7; k++ && l++) {
     for (j = 1; j < 60; j++){
       if (j != 55 or j != 56){
-        if (k < id_init + 43)  {
+        if (k < 43)  {
           params[k][j] = params[l][j];
           paramsCopy[k][j] = paramsCopy[l][j];
           Copytemp[j] = params[l][j];
         }
-        if (k > id_init + 42) {Copytemp[j] = params[l][j];}
+        if (k > 42) {Copytemp[j] = params[l][j];}
       }
       if (j == 55){Copytemp[j] = progChang[l][0];}
       if (j == 56){Copytemp[j] = progChang[l][1];}
     }
-    Serial.println("");Serial.print(" ID = ");Serial.println(l);
+    //Serial.println("");Serial.print(" ID = ");Serial.println(l);
     idcopy = k;
     saveDataCopy();
     delay(50);
@@ -768,7 +794,11 @@ void CopyPatch(){
   initEncoder(7);
   while (menus == 2){
     if (tmp == 1) {Screens(6, 0); Screens(7,0); Screens(8,0); tmp = 0;}
-    if (enc1last != encoder1.getCount()) {encod1(1,18,cp1,2);} 
+    if (enc1last != encoder1.getCount()) {
+      if(bank == 1){encod1(1,6,cp1,2);}
+      if(bank == 2){encod1(7,12,cp1,2);}
+      if(bank == 3){encod1(13,18,cp1,2);}
+    } 
     if (enc2last != encoder2.getCount()) {encod2(1,18,cp2,3);} 
     if (digitalRead(5) == 0) {
       delay(250);
@@ -787,21 +817,30 @@ void CopyPatch(){
   }
 }
 
+void saveScenes(){
+  Screens(13, 0); 
+  for (j = id_init + 1; j < id_init + 7; j++){idcopy = j; saveDataScene();}
+  //for (j = id_init+1; j < id_init+7; j++) {idcopy = j; saveDataPC();}
+  count1 = 0; count2 = 0;
+}
+
 void CopyPC(){
   byte tmp = 1;
   while (menus == 2){
     if (tmp == 1) {Screens(12, 0);tmp = 0;}
     if (digitalRead(5) == 0) {
       delay(250);
-      if (digitalRead(23) == 0) {Screens(13, 0); for (j = id+1; j < id+7; j++) {idcopy = j; saveDataPC();}}
-      count1 = 0; count2 = 0;
+      if (digitalRead(23) == 0) {
+          saveScenes();
+        }
       startcharg = 2;
       break;
     }
     if (digitalRead(23) == 0) {
       delay(250);
-      if (digitalRead(5) == 0) {Screens(13, 0); for (j = id+1; j < id+7; j++) {idcopy = j; saveDataPC();}}
-      count1 = 0; count2 = 0; 
+      if (digitalRead(5) == 0) {
+          saveScenes();
+        }
       startcharg = 3;
       break;
     }
@@ -826,8 +865,8 @@ void firstcharg(){
     if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
     if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
     if (i == 42) {typereverb();}
-    else {if (params[id][i] < 118) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}}
-    delay(5);
+    else {if (params[id][i] < 128) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}}
+    delay(5);//Serial.println(i);
   }
   for (i = 1; i < 18; i++){
     if (i < 14) {
@@ -839,31 +878,40 @@ void firstcharg(){
   }
 }
 
+void chargProgAmpero() {
+  for (i = 1; i < 18; i++){
+    if (params[id][i] != params[preid][i]) {
+      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
+      if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
+      if (count1 > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
+    }
+  }
+}
+
 void chgtPedal() {
-  if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1);}
+  if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1); }
   delay(20);
-  if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2);}
+  if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2); }
   delay(20);
   for (i = 18; i < params[id][54]; i++){
+    //Serial.println(""); Serial.print ("ID Actuel = "); Serial.println(params[id][i]);
+    //Serial.print(""); Serial.print ("ID Avant  = "); Serial.println(params[preid][i]);
     if (params[id][i] != params[preid][i]) {
-      if (i != 42) {
-        if (params[id][i] == 139) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
-        if (params[id][i] == 140) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
-        if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
-        if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
-        if (params[id][i] < 118) {
-          MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);
-        }
+      if (params[id][i] == 139) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+      if (params[id][i] == 140) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
+      if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
+      if (params[id][i] < 128) {
+        if (i != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
       }
-      else {typereverb();}
-  delay(10);
+      if (i == 42) {count = 42; typereverb();}
     }
   }
   for (i = 1; i < 18; i++){
     if (params[id][i] != params[preid][i]) {
       if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
       if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
-      if (count1 > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
+      if (i > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
     }
   }
 }
@@ -876,7 +924,7 @@ void selectBank() {
 
 void handleControlChange(byte channel, byte number, byte value) {
   if (channel == 12){bank = value;}
-  Serial.print("Bank = ");Serial.println(bank);
+  //Serial.print("Bank = ");Serial.println(bank);
   if (channel == 16) {
     preid = id; 
     id_init = value; id = value;
@@ -910,6 +958,8 @@ void setup() {
   
   Serial.begin(115200);
   //Serial2.begin(9600);
+  MIDI.begin(MIDI_CHANNEL_OMNI);  
+  MIDI.setHandleControlChange(handleControlChange);
 
   Wire.begin(22, 21);
 
@@ -919,18 +969,14 @@ void setup() {
   button7.attachClick([] () {if(menus == 0) {btn = 1; BoutRot(1, menus);}});
   button8.attachClick([] () {if(menus == 0) {btn = 2; BoutRot(2, menus);}});
 
-  button7.attachLongPressStop([] () {texteline2 = "toto"; menus, btn = 1; BoutRot(1, menus);});
+  button7.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; btn = 1; BoutRot(1, menus);});
   button8.attachLongPressStop([] () {texteline2 = "toto"; menus = 1; btn = 2; BoutRot(2, menus);});
 
   button7.attachDoubleClick([] () {texteline2, texteline1 = "toto"; menus = 2; CopyPC();});
   button8.attachDoubleClick([] () {texteline2, texteline1 = "toto"; menus = 2; CopyPatch();});
 
-
-  MIDI.begin(MIDI_CHANNEL_OMNI);  
-  MIDI.setHandleControlChange(handleControlChange);
-
   if(SPIFFS.begin(true)){
-    File root = SPIFFS.open("/"); bank = 1; id = 1, startcharg = 1; selectBank(); preid = 1;}
+    File root = SPIFFS.open("/"); bank = 1; id = 1, id_init = id; startcharg = 1; selectBank(); preid = 1;}
   else {Serial.println("SPIFFS marche pas");} 
 
   ESP32Encoder::useInternalWeakPullResistors=NONE;
@@ -966,7 +1012,7 @@ void loop(){
     texteline2, texteline1 = "toto";
   }
   MIDI.read();
-  if (startcharg == 2) {startcharg = 0; menus = 0; texteline1, texteline2 = "toto"; BoutRot(1, menus); Screens(2, 0);}  
-  if (startcharg == 3) {startcharg = 0; menus = 0; texteline1, texteline2 = "toto"; BoutRot(2, menus); Screens(3, 0);}
+  if (startcharg == 2) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(1, menus); Screens(2, 0);}  
+  if (startcharg == 3) {startcharg = 0; menus = 0; texteline1 = "toto"; texteline2 = "toto"; BoutRot(2, menus); Screens(3, 0);}
 }
 
