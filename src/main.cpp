@@ -47,7 +47,7 @@ const byte COLOR_WHITE = 0b111;*/
 
 static int i, oldid, j, k, l = 0;
 static short choixbd, oldbank, menus = 0; 
-static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, btn, cp1, cp2,idcopy, cpt = 1; static short canal2 = 2; static short canal1 = 3;
+static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, btn, cp1, cp2,idcopy, cpt = 1; static short canal2 = 7; static short canal1 = 8;
 static short preid = -1;
 static int ampvalbk, tonevalbk = 0;
 
@@ -890,7 +890,7 @@ void firstcharg(){
     if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
     if (i == 42) {typereverb();}
     else {if (params[id][i] < 128) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}}
-    delay(5);//Serial.println(i);
+    delay(15);//Serial.println(i);
   }
   for (i = 1; i < 18; i++){
     if (i < 14) {
@@ -913,29 +913,31 @@ void chargProgAmpero() {
 }
 
 void chgtPedal() {
-  if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1); }
-  delay(35);
   if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2); }
-  delay(35);
-  for (i = 18; i < params[id][54]; i++){
+  delay(2);
+  if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1); }
+  delay(2);
+  for (i = 1; i < 18; i++){
+    if (params[id][i] != params[preid][i]) {
+      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
+      if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
+      if (i > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
+    }
+  }
+  delay(15);
+  for (i = 18; i < 46; i++){
     //Serial.println(""); Serial.print ("ID Actuel = "); Serial.println(params[id][i]);
     //Serial.print(""); Serial.print ("ID Avant  = "); Serial.println(params[preid][i]);
-    if (params[id][i] != params[preid][i]) {
+    //if (params[id][i] != params[preid][i]) {
       if (params[id][i] == 139) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
       if (params[id][i] == 140) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
       if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal1);}
       if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal1);}
       if (params[id][i] < 128) {
         if (i != 42) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal1);}
-      }
+      //}
+      delay(12);
       if (i == 42) {count = 42; typereverb();}
-    }
-  }
-  for (i = 1; i < 18; i++){
-    if (params[id][i] != params[preid][i]) {
-      if (params[id][i] == 129) {MIDI.sendControlChange(totalcc[0][i], 0, canal2);}
-      if (params[id][i] == 130) {MIDI.sendControlChange(totalcc[0][i], 127, canal2);}
-      if (i > 13) {MIDI.sendControlChange(totalcc[0][i], params[id][i], canal2);}
     }
   }
 }
