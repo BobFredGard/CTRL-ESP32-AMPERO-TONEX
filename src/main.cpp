@@ -47,7 +47,7 @@ const byte COLOR_WHITE = 0b111;*/
 
 static int i, oldid, j, k, l = 0;
 static short choixbd, oldbank, menus = 0; 
-static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, btn, cp1, cp2,idcopy = 1; static short canal2 = 2; static short canal1 = 3;
+static short id, id_init, count, startscreen, bank, couleur1, couleur2, count1, count2, startcharg, btn, cp1, cp2,idcopy, cpt = 1; static short canal2 = 2; static short canal1 = 3;
 static short preid = -1;
 static int ampvalbk, tonevalbk = 0;
 
@@ -257,7 +257,7 @@ void saveDataCopy() {
   sql = "UPDATE stomps SET ";
   for (i = 1; i < 60; i++){
     if (i < 58){
-      sql += "'"+String(i)+"'="+String(Copytemp[i])+", "; 
+      sql += "'"+String(i)+"'="+String(Copytemp[i])+", ";
     }
     if (i == 58){
       sql += "'"+String(i)+"'="+String(Copytemp[i]); 
@@ -272,28 +272,27 @@ void saveDataCopy() {
 void saveDataScene() {
   if (db_open("/spiffs/base.db", &db_base)) return;
   sql = "UPDATE stomps SET ";
-  for (i = 1; i < 54; i++){
-    if (i < 54){
-      sql += "'"+String(i)+"'="+String(params[id_init][i])+", "; 
+  for (i = 1; i < 59; i++){
+    if (l == 2) {
+      if (i < 55){
+      sql += "'"+String(i)+"'="+String(params[cpt][i])+", "; params[idcopy][i] = params[cpt][i]; paramsCopy[idcopy][i] = paramsCopy[cpt][i];
+      } 
     }
     if (i == 55){
-        sql += "'"+String(i)+"'="+String(progChang[id_init][0])+", "; 
+        sql += "'"+String(i)+"'="+String(progChang[cpt][0])+", "; progChang[idcopy][0] = progChang[cpt][0];
     }
     if (i == 56){
-        sql += "'"+String(i)+"'="+String(progChang[id_init][1]); 
+        sql += "'"+String(i)+"'="+String(progChang[cpt][1])+", "; progChang[idcopy][1] = progChang[cpt][1];
+    }
+    if (l == 2) {
+      if (i > 56 && i < 58){
+      sql += "'"+String(i)+"'="+String(params[cpt][i])+", "; params[idcopy][i] = params[cpt][i]; paramsCopy[idcopy][i] = paramsCopy[cpt][i];
+      } 
+      if (i == 58){
+      sql += "'"+String(i)+"'="+String(params[cpt][i]); params[idcopy][i] = params[cpt][i]; paramsCopy[idcopy][i] = paramsCopy[cpt][i];
+      }
     }
   }
-  sql += " WHERE stomps_id="+String(idcopy)+";";
-  db_exec(db_base, sql.c_str());
-  sqlite3_close(db_base);
-  Serial.println(sql);
-}
-
-void saveDataPC() {
-  if (db_open("/spiffs/base.db", &db_base)) return;
-  sql = "UPDATE stomps SET ";
-  sql += "'"+String(55)+"'="+String(progChang[id][0])+", "; progChang[idcopy][0] = progChang[id][0];
-  sql += "'"+String(56)+"'="+String(progChang[id][1]);  progChang[idcopy][1] = progChang[id][1];
   sql += " WHERE stomps_id="+String(idcopy)+";";
   db_exec(db_base, sql.c_str());
   sqlite3_close(db_base);
@@ -495,16 +494,21 @@ void Screens(byte choixscreen, int val2) {
     case 12 :
       LCD.clear();
       LCD.setCursor(0,0);
-      LCD.print("????  COPY  ????");
+      LCD.print("Copy Patch :    ");
       LCD.setCursor(0,1);
-      LCD.print("Progs AMP/TONE-X");
+      LCD.print("** AMP/TONE-X **");
     break;
     case 13 :
       LCD.clear();
       LCD.setCursor(0,0);
-      LCD.print("****  COPY  ****");
+      LCD.print("* Copy en cours *");
       LCD.setCursor(0,1);
-      LCD.print("Progs AMP/TONE-X");
+      LCD.print("** AMP/TONE-X **");
+    break;
+    case 14 :
+      LCD.clear();
+      LCD.setCursor(13,0);
+      LCD.print(cp1);
     break;
   }
   oldid = id;
@@ -557,6 +561,15 @@ void encod1(byte valmini, byte valmaxi, byte pot, byte sel){
       encoder1.setCount(pot);
       enc1last = pot;
       Screens(7, cp1);
+    break;
+    case 3 :
+      pot = encoder1.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      cp1 = pot;
+      encoder1.setCount(pot);
+      enc1last = pot;
+      Screens(14, cp1);
     break;
   }
 }
@@ -819,18 +832,28 @@ void CopyPatch(){
 
 void saveScenes(){
   Screens(13, 0); 
-  for (j = id_init + 1; j < id_init + 7; j++){idcopy = j; saveDataScene();}
+  if (cp1 == 1) {cpt = 1;} if (cp1 == 2) {cpt = 8;} if (cp1 == 3) {cpt = 15;} if (cp1 == 4) {cpt = 22;} if (cp1 == 5) {cpt = 29;} if (cp1 == 6) {cpt = 36;}
+  if (cp1 == 7) {cpt = 43;} if (cp1 == 8) {cpt = 50;} if (cp1 == 9) {cpt = 57;} if (cp1 == 10) {cpt = 64;} if (cp1 == 11) {cpt = 71;} if (cp1 == 12) {cpt = 78;}
+  if (cp1 == 13) {cpt = 85;} if (cp1 == 14) {cpt = 92;} if (cp1 == 15) {cpt = 99;} if (cp1 == 16) {cpt = 106;} if (cp1 == 17) {cpt = 113;} if (cp1 == 18) {cpt = 120;}
+  
+  for (j = cpt; j < cpt + 7; j++){idcopy = j; saveDataScene();}
   //for (j = id_init+1; j < id_init+7; j++) {idcopy = j; saveDataPC();}
   count1 = 0; count2 = 0;
 }
 
 void CopyPC(){
-  byte tmp = 1;
+  byte tmp = 1; l = 0;
   while (menus == 2){
     if (tmp == 1) {Screens(12, 0);tmp = 0;}
+    if (enc1last != encoder1.getCount()) {
+      if(bank == 1){encod1(1,6,cp1,2);}
+      if(bank == 2){encod1(7,12,cp1,2);}
+      if(bank == 3){encod1(13,18,cp1,2);}
+    } 
     if (digitalRead(5) == 0) {
       delay(250);
-      if (digitalRead(23) == 0) {
+      if (digitalRead(5) == 0) {
+          l = 1;
           saveScenes();
         }
       startcharg = 2;
@@ -838,7 +861,8 @@ void CopyPC(){
     }
     if (digitalRead(23) == 0) {
       delay(250);
-      if (digitalRead(5) == 0) {
+      if (digitalRead(23) == 0) {
+          l = 2;
           saveScenes();
         }
       startcharg = 3;
@@ -890,9 +914,9 @@ void chargProgAmpero() {
 
 void chgtPedal() {
   if (progChang[id][0] != progChang[preid][0]) {progChange(tonevalbk, progChang[id][0], canal1); }
-  delay(20);
+  delay(35);
   if (progChang[id][1] != progChang[preid][1]) {progChange(ampvalbk,  progChang[id][1], canal2); }
-  delay(20);
+  delay(35);
   for (i = 18; i < params[id][54]; i++){
     //Serial.println(""); Serial.print ("ID Actuel = "); Serial.println(params[id][i]);
     //Serial.print(""); Serial.print ("ID Avant  = "); Serial.println(params[preid][i]);
