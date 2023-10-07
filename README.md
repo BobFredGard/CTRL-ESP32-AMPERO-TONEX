@@ -13,7 +13,7 @@ Le bouton de gauche donne un accès rapide à 5 paramètres au choix (voir Amper
 
 Le bouton de gauche donne un accès rapide à 5 paramètres au choix (voir toneXquick)!
 
-Quand on reste appuyé plus de 2s sur le bouton 1, on entre dans l'édition totale des paramètres, en commençant par ceux de l'AMPERO, et idem en restant appuyé sur le bouton 2, on entre dans cette même fenêtre, en commençant par les paramètre du TONEX!
+Quand on reste appuyé plus de 2s sur le bouton 1, on entre dans l'édition totale des paramètres, en commençant par ceux de l'AMPERO, et idem en restant appuyé sur le bouton 2, on entre dans cette même fenêtre, en commençant par les paramètres du TONEX!
 
 Les Patchs sont pensés comme suit : les 6 pédales du PACER de 1 à 6 correspondent à des Patchs de 7 scènes, dont la 1ère est accessible par la pédale 1. Les autres le sont par les pédales de A à D et les FS 1-3. J'ai utilisé 6 banques de 6 Patchs pour un total de 36 Patchs!!! On peut dire qu'il y a 6 patchs accessibles par les pédales 1 à 6 du PACER et 6 scènes par patchs!
 J'ai ajouté une fonction CopyPatch qui permet de copier chaque Patch vers le Patch de son choix, quelque soit la banque en cours! Pour cela, double clic sur le bouton droit. On choisit le patch a copier avec le rotatif 1 et la destination avec le rotatif 2! La destination montre la banque puis le numéro de pédale à choisir!!!
