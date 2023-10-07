@@ -10,6 +10,7 @@ J'ai voulu une interface simple, pour commencer :
     et 2 prises MIDI
 
 Le bouton de gauche donne un accès rapide à 5 paramètres au choix (voir Amperoquick)!
+
 Le bouton de gauche donne un accès rapide à 5 paramètres au choix (voir toneXquick)!
 
 Quand on reste appuyé plus de 2s sur le bouton 1, on entre dans l'édition totale des paramètres, en commençant par ceux de l'AMPERO, et idem en restant appuyé sur le bouton 2, on entre dans cette même fenêtre, en commençant par les paramètre du TONEX!
