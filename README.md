@@ -15,6 +15,7 @@ Quand on reste appuyé plus de 2s sur le bouton 1, on entre dans l'édition tota
 
 Les Patchs sont pensés comme suit : les 6 pédales du PACER de 1 à 6 correspondent à des Patchs de 7 scènes, dont la 1ère est accessible par la pédale 1. Les autres le sont par les pédales de A à D et les FS 1-3. J'ai utilisé 6 banques de 6 Patchs pour un total de 36 Patchs!!! On peut dire qu'il y a 6 patchs accessibles par les pédales 1 à 6 du PACER et 6 scènes par patchs!
 J'ai ajouté une fonction CopyPatch qui permet de copier chaque Patch vers le Patch de son choix, quelque soit la banque en cours! Pour cela, double clic sur le bouton droit. On choisit le patch a copier avec le rotatif 1 et la destination avec le rotatif 2! La destination montre la banque puis le numéro de pédale à choisir!!!
+
 J'ai aussi mis une option sur un double clic gauche pour copier, au sein d'un patch, les programs changes des 2 appareils vers les 6 autres scènes!!!
 Sur cette dernière option, j'ai ajouté la possibilité de lister chaque patch d'un même banque à fin d'en récupérer une ligne SQL qui me permet de sauvegarder mes presets. On retrouve mes presets dans le répertoire "Utils"!
 
