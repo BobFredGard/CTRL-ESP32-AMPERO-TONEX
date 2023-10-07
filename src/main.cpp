@@ -74,7 +74,7 @@ static int encvalmin1 [7] = {0,0, 0, 0, 0, 1299, 1299};
 static int encvalmax2 [7] = {0,127, 127, 127, 127, 127, 127};
 static int encvalmin2 [7] = {0,0, 0, 0, 0, 0, 0};
 
-static int params[43][60]; static int paramsCopy[43][60];  static int Copytemp[60]; 
+static int params[43][60]; static int paramsCopy[43][60];  static int Copytemp[60];
 
 static const char* texteline1;
 static const char* texteline2;
@@ -307,7 +307,7 @@ void Screens(byte choixscreen, int val2) {
       LCD.setCursor(15,0);
       LCD.print(bank);
       LCD.setCursor(0,1);
-      LCD.print("Stomp:  |  by FB");
+      LCD.print("Stomp:  | Amp/Tx");
       LCD.setCursor(7,1);
       LCD.print(stomp);
     break;
@@ -403,7 +403,7 @@ static int call(void *daTa, int argc, char **argv, char **azColName) {
   static int m; String test = "Val = ";
     for (m = 0; m<argc; m++){
       String val = argv[m];
-      //String val2 = azColName[m];
+      String val2 = azColName[m];
       switch (choixbd){
         case 0 :
           params[i][m] = val.toInt(); paramsCopy [i][m] = val.toInt();
@@ -872,8 +872,8 @@ void CopyPatch(){
 }
 
 void saveScenes(){
-  Screens(13, 0);               //  1 2  3  4  5  6  7  8  9 10 11 12 13 14 15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36 
-  //static int idcopyplus [37] = {0,1,8,15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,120,127,134,141,148,155,162,169,176,183,190,197,204,211,218,225,232,239,246};
+  Screens(13, 0);               //  1 2  3  4  5  6   7  8  9 10 11 12  13 14 15  16  17  18   19  20  21  22  23  24   25  26  27  28  29  30   31  32  33  34  35  36 
+  //static int idcopyplus [37] = {0,1,8,15,22,29,36, 43,50,57,64,71,78, 85,92,99,106,113,120, 127,134,141,148,155,162, 169,176,183,190,197,204, 211,218,225,232,239,246};
   if (bank == 1){m = idcopyplus[cp1];}
   if (bank == 2){m = idcopyplus[cp1+6];}
   if (bank == 3){m = idcopyplus[cp1+12];}
@@ -932,7 +932,7 @@ void firstcharg(){
     if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal1);}
     if (i == 42) {typereverb();}
     else {if (params[id][i] < 128) {MIDI.sendControlChange(totalcc[i], params[id][i], canal1);}}
-    delay(15);//Serial.println(i);
+    delay(15);
   }
   for (i = 1; i < 18; i++){
     if (i < 14) {
@@ -944,44 +944,42 @@ void firstcharg(){
   }
 }
 
-void chargProgAmpero() {
-  for (i = 1; i < 18; i++){
-    if (params[id][i] != params[preid][i]) {
-      if (params[id][i] == 1299) {MIDI.sendControlChange(totalcc[i], 0, canal2);}
-      if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal2);}
-      if (count1 > 13) {MIDI.sendControlChange(totalcc[i], params[id][i], canal2);}
-    }
-  }
+void changtAmpero() {
+  if (params[id][i] == 1299) {MIDI.sendControlChange(totalcc[i], 0, canal2);}
+  if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal2);}
+  if (i > 13) {MIDI.sendControlChange(totalcc[i], params[id][i], canal2);}
+  //Serial.print(i);Serial.print("="); Serial.print(params[id][i]);Serial.print("|");
+}
+
+void changToneX() {
+  if (params[id][i] == 1399) {MIDI.sendControlChange(totalcc[i], 0, canal1);}
+  if (params[id][i] == 1400) {MIDI.sendControlChange(totalcc[i], 127, canal1);}
+  if (params[id][i] == 1299) {MIDI.sendControlChange(totalcc[i], 0, canal1);}
+  if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal1);}
+  if (params[id][i] < 128) {if (i != 42) {MIDI.sendControlChange(totalcc[i], params[id][i], canal1);}}
+  if (i == 42) {count = 42; typereverb();}
+  delay(15);
+  //Serial.print(i);Serial.print("="); Serial.print(params[id][i]);Serial.print("|");
 }
 
 void chgtPedal() {
+  byte tmp5 = 0;
   if (params[id][56] != params[preid][56]) {progChange(ampvalbk,  params[id][56], canal2); }
-  delay(2);
   if (params[id][55] != params[preid][55]) {progChange(tonevalbk, params[id][55], canal1); }
-  delay(2);
+  
   for (i = 1; i < 18; i++){
-    if (params[id][i] != params[preid][i]) {
-      if (params[id][i] == 1299) {MIDI.sendControlChange(totalcc[i], 0, canal2);}
-      if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal2);}
-      if (i > 13) {MIDI.sendControlChange(totalcc[i], params[id][i], canal2);}
-    }
+    if (params[id][56] != params[preid][56]) {changtAmpero(); tmp5 = 1;}
+    if (params[id][i] != paramsCopy[preid][i] && tmp5 == 0) {changtAmpero(); tmp5 = 0;}
   }
-  delay(45);
+  tmp5 = 0;
+  //Serial.print(" // "); 
+  if (params[id][55] != params[preid][55]) {progChange(tonevalbk, params[id][55], canal1); }
+  delay(30);
   for (i = 18; i < 46; i++){
-    //Serial.println(""); Serial.print ("ID Actuel = "); Serial.println(params[id][i]);
-    //Serial.print(""); Serial.print ("ID Avant  = "); Serial.println(params[preid][i]);
-    //if (params[id][i] != params[preid][i]) {
-      if (params[id][i] == 1399) {MIDI.sendControlChange(totalcc[i], 0, canal1);}
-      if (params[id][i] == 1400) {MIDI.sendControlChange(totalcc[i], 127, canal1);}
-      if (params[id][i] == 1299) {MIDI.sendControlChange(totalcc[i], 0, canal1);}
-      if (params[id][i] == 1300) {MIDI.sendControlChange(totalcc[i], 127, canal1);}
-      if (params[id][i] < 128) {
-        if (i != 42) {MIDI.sendControlChange(totalcc[i], params[id][i], canal1);}
-      //}
-      delay(15);
-      if (i == 42) {count = 42; typereverb();}
-    }
+    if (params[id][55] != params[preid][55]) {changToneX(); tmp5 = 1;}
+    if (params[id][i] != paramsCopy[preid][i] && tmp5 == 0) {changToneX(); tmp5 = 0;}
   }
+  //Serial.println("");
 }
 
 void Select() {
@@ -999,7 +997,7 @@ void handleControlChange(byte channel, byte number, byte value) {
   //Serial.print("Bank = ");Serial.println(bank);
   if (channel == 16) {
     pied = 1;
-    preid = 0; 
+    preid = id; 
     id_init = value; id = value;
     count1 = 0; count2 = 0; menus = 0;
     Select(); 
