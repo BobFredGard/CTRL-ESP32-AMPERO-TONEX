@@ -5,6 +5,19 @@ LiquidCrystal_I2C LCD(0x3F,16,2);
 
 #include <SPIFFS.h>
 
+#include <WiFi.h>
+const char *ssid2 = "My SSID";
+const char *password2 = "My Password";
+IPAddress ip;
+
+#include "Network.h"
+#include "Sys_Variables.h"
+#include "CSS.h"
+
+#include <ESP32WebServer.h>
+ESP32WebServer server(80);
+#include <ESPmDNS.h>
+
 #include <sqlite3.h>
 sqlite3 *db_base;
 
@@ -620,6 +633,7 @@ void encod1(int valmini, int valmaxi, int pot, byte sel){
       Screens(14, cp1);
     break;
   }
+  previousMillis = millis(); tmp2 = 1;
 }
 
 void encod2(int valmini, int valmaxi, int pot, byte sel){
@@ -689,6 +703,7 @@ void encod2(int valmini, int valmaxi, int pot, byte sel){
       Screens(8, cp2);
     break;
   }
+  previousMillis = millis(); tmp2 = 1;
 }
 
 void commun(){
@@ -895,6 +910,7 @@ void saveScenes(){
 void CopyPC(){
   tmp = 1; l = 0;
   while (menus == 2){
+    server.handleClient();
     if (tmp == 1) {Screens(12, 0);tmp = 0;}
     if (enc1last != encoder1.getCount()) {
       encod1(1,6,cp1,2);
@@ -1033,6 +1049,77 @@ void handleControlChange(byte channel, byte number, byte value) {
   }
 }
 
+//---PARTIE WEB SERVER http://fileserver.local ou http://192.168.8.117
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void SendHTML_Header() {
+  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  server.sendHeader("Pragma", "no-cache");
+  server.sendHeader("Expires", "-1");
+  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
+  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
+  append_page_header();
+  server.sendContent(webpage);
+  webpage = "";
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void SendHTML_Stop() {
+  server.sendContent("");
+  server.client().stop(); // Stop is needed because no content length was sent
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void SendHTML_Content() {
+  server.sendContent(webpage);
+  webpage = "";
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void ReportFileNotPresent(String target) {
+  SendHTML_Header();
+  webpage += F("<h3>File does not exist</h3>");
+  webpage += F("<a href='/"); webpage += target + "'>[Back]</a><br><br>";
+  append_page_footer();
+  SendHTML_Content();
+  SendHTML_Stop();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void SD_file_download(String filename) {
+  File download = SPIFFS.open("/" + filename, "r");
+  if (download) {
+    server.sendHeader("Content-Type", "text/text");
+    server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
+    server.sendHeader("Connection", "close");
+    server.streamFile(download, "application/octet-stream");
+    download.close();
+  } else ReportFileNotPresent("download");
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void SelectInput(String heading1, String heading2, String command, String arg_calling_name) {
+  SendHTML_Header();
+  webpage += F("<h3 class='rcorners_m'>"); webpage += heading1 + "</h3><br>";
+  webpage += F("<h3>"); webpage += heading2 + "</h3>";
+  webpage += F("<FORM action='/"); webpage += command + "' method='post'>"; // Must match the calling argument e.g. '/chart' calls '/chart' after selection but with arguments!
+  webpage += F("<input type='text' name='"); webpage += arg_calling_name; webpage += F("' value=''><br>");
+  webpage += F("<type='submit' name='"); webpage += arg_calling_name; webpage += F("' value=''><br><br>");
+  append_page_footer();
+  SendHTML_Content();
+  SendHTML_Stop();
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void File_Download() { // This gets called twice, the first pass selects the input, the second pass then processes the command line arguments
+  if (server.args() > 0 ) { // Arguments were received
+    if (server.hasArg("download")) SD_file_download(server.arg(0));
+  }
+  else SelectInput("File Download", "Enter filename to download", "download", "download");
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void HomePage() {
+  SendHTML_Header();
+  webpage += F("<a href='/download'><button>Download</button></a>");
+  append_page_footer();
+  SendHTML_Content();
+  SendHTML_Stop(); // Stop is needed because no content length was sent
+}
+
+
 void setup() {
   pinMode(33, OUTPUT); pinMode(32, OUTPUT); pinMode(25, OUTPUT);
 
@@ -1081,9 +1168,28 @@ void setup() {
   texteline2, texteline1 = "toto";
   BoutRot(1, menus);
   BoutRot(2, menus);
-  Screens(2, 0);
   previousMillis = millis();
   tmp2 = 1;
+
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.begin(ssid2, password2);
+  while (WiFi.status() != WL_CONNECTED) { // Wait for the Wi-Fi to connect
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println(".");
+  Serial.println("Wifi connecté");
+  ip = WiFi.localIP();
+  server.on("/",              HomePage);
+  server.on("/download", File_Download);
+  server.begin();
+
+  LCD.clear();
+  LCD.setCursor(7,0);
+  LCD.print("IP");
+  LCD.setCursor(2,1);
+  LCD.print(ip);
+  delay(5000);
 }
 //----------------------------------------------------------------------------------END SETUP
 
