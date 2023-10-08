@@ -572,13 +572,20 @@ void encod1(int valmini, int valmaxi, int pot, byte sel){
     case 0 :
       pot = encoder1.getCount();
       if (pot > valmaxi) {pot = valmaxi;}
-      if (pot < valmini) {pot = valmini;}
+      if (pot < valmini) { pot = valmini; }
       if ( count1 < 5 ) {
-        midiblabla(amperoquick[0][count1], pot, canal2); params[id][amperoquick[1][count1]] = pot;
+        midiblabla(amperoquick[0][count1], pot, canal2);
+        params[id][amperoquick[1][count1]] = pot;
       }
       else {
-        if (pot == 1299) {midiblabla(amperoquick[0][count1], 0, canal2); params[id][amperoquick[1][count1]] = pot;}
-        if (pot == 1300) {midiblabla(amperoquick[0][count1], 127, canal2); params[id][amperoquick[1][count1]] = pot;}
+        if (pot == 1299) {
+          midiblabla(amperoquick[0][count1], 0, canal2); 
+          params[id][amperoquick[1][count1]] = pot;
+        }
+        if (pot == 1300) {
+          midiblabla(amperoquick[0][count1], 127, canal2);
+          params[id][amperoquick[1][count1]] = pot;
+        }
         Serial.println(pot);
       }
       encoder1.setCount(pot);
@@ -993,7 +1000,7 @@ void Select() {
 }
 
 void handleControlChange(byte channel, byte number, byte value) {
-  if (channel == 12){bank = value;}
+  if (channel == 12){bank = value; Select(); choixprogchang(); firstcharg();}
   //Serial.print("Bank = ");Serial.println(bank);
   if (channel == 16) {
     pied = 1;
