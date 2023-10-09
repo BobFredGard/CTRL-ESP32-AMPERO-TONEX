@@ -87,15 +87,15 @@ static int values_mini_ampero_quick [7] = {0,0, 0, 0, 0, 1299, 1299};
 static int values_max_tonex_quick [7] = {0,127, 127, 127, 127, 127, 127};
 static int values_mini_tonex_quick [7] = {0,0, 0, 0, 0, 0, 0};
 
-static int all_parameters[43][60];
-static int all_data_base_parameters_copy[43][60];
-static int temp_transfert_datas[60];
+static int all_parameters [43][ 60];
+static int all_data_base_parameters_copy [43] [60];
+static int temp_transfert_datas [60];
 
 static const char* line1_lcd_text;
 static const char* line2_lcd_text;
 static String slq_request;
 
-static const char* global_names[57] = {  "", 
+static const char* global_names [57] = {  "", 
   "SLOT A1    : ", "SLOT A2    : ", "SLOT A3    : ", "SLOT A4    : ", "SLOT A5    : ", "SLOT A6    : ",
   "SLOT B1    : ", "SLOT B2    : ", "SLOT B3    : ", "SLOT B4    : ", "SLOT B5    : ", "SLOT B6    : ",
   "PEDAL EXP  : ", "PARAM 1    : ", "PARAM 2    : ", "PARAM 3    : ", "VOLUME     : ",
@@ -123,7 +123,7 @@ static int global_control_change_max_values [57] = {0,
 
 static int id_values_for_6_foot [37] = {0,1,8,15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,120,127,134,141,148,155,162,169,176,183,190,197,204,211,218,225,232,239,246};
 
-static const char* tonex_reverb_names[5] = {"SPRING1", "SPRING2", "SPRING3", "ROOM ", "PLATE"};
+static const char* tonex_reverb_names [5] = {"SPRING1", "SPRING2", "SPRING3", "ROOM ", "PLATE"};
 
 void program_change(byte CC, int val, byte canal) {
   MIDI.sendControlChange(0, CC, canal);
@@ -145,7 +145,7 @@ void typereverb() {
   //Serial.println(42);
 }
 
-static float valminimax[2][57] = {
+static float valminimax [2] [57] = {
   {0,
     0,0,0,0,0,0,
     0,0,0,0,0,0,
@@ -174,7 +174,7 @@ static float valminimax[2][57] = {
 
 float view_tonex_value, all_data_base_parameters;
 
-void scale_value_switch(byte val3){
+void Scale_value_switch (byte val3) {
   view_tonex_value = (valminimax[1][global_count]-valminimax[0][global_count])*all_parameters[id][global_count]/global_control_change_max_values[global_count]+valminimax[0][global_count];
   switch (val3){
   case 1 :
@@ -204,7 +204,7 @@ void scale_value_switch(byte val3){
   }
 }
 
-void Screens(byte screen_choice, int val2) {
+void Screens (byte screen_choice, int val2) {
   //LCD.clear();
   String text;
   switch (screen_choice) {
@@ -234,82 +234,176 @@ void Screens(byte screen_choice, int val2) {
         }
         text = String(choiced_foot_on_pacer) + " ";LCD.setCursor(1,0); LCD.print(text);
       }
-      if (global_count == 54){if (line1_lcd_text != "*Fin Sauvegd") {LCD.setCursor(5,0); line1_lcd_text = "*Fin Sauvegd"; LCD.print(line1_lcd_text);}}
-      if (global_count == 55 or global_count == 56){if (line1_lcd_text != "*Prog Change") {LCD.setCursor(5,0); line1_lcd_text = "*Prog Change"; LCD.print(line1_lcd_text);}}
+      if (global_count == 54){
+        if (line1_lcd_text != "*Fin Sauvegd") {
+          LCD.setCursor(5,0); line1_lcd_text = "*Fin Sauvegd";
+          LCD.print(line1_lcd_text);
+        }
+      }
+      if (global_count == 55 or global_count == 56){
+        if (line1_lcd_text != "*Prog Change") {
+          LCD.setCursor(5,0); line1_lcd_text = "*Prog Change";
+          LCD.print(line1_lcd_text);
+        }
+      }
       LCD.setCursor(0,1);
-      if (line2_lcd_text != global_names[global_count]) {line2_lcd_text = global_names[global_count]; LCD.print(line2_lcd_text);}
-      LCD.setCursor(13,1); LCD.print("   ");
+      if (line2_lcd_text != global_names[global_count]) {
+        line2_lcd_text = global_names[global_count];
+        LCD.print(line2_lcd_text);
+      }
+      LCD.setCursor(13,1);
+      LCD.print("   ");
       LCD.setCursor(13,1); 
       if (global_count != 55 && global_count != 56) {
         if (val2 == 1399 or val2 == 1400) {
-          if (val2 == 1399) {LCD.setCursor(10,1); LCD.print(":  PRE"); val2 = 1399;}
-          else {LCD.setCursor(10,1); LCD.print(": POST"); val2 = 1400;}
+          if (val2 == 1399) {
+            LCD.setCursor(10,1);
+            LCD.print(":  PRE");
+            val2 = 1399;
+          }
+          else {
+            LCD.setCursor(10,1);
+            LCD.print(": POST");
+            val2 = 1400;
+          }
         }
         if (val2 == 1300 or val2 == 1299) {
-            if (all_parameters[id][global_count] == 1300) {LCD.print("ON "); val2 = 1300;}
-            else {LCD.print("OFF"); val2 = 1299;}
+            if (all_parameters[id][global_count] == 1300) {
+              LCD.print("ON "); val2 = 1300;
+            }
+            else {
+              LCD.print("OFF"); val2 = 1299;
+            }
         }
         if (all_parameters[id][global_count] < 128) {          
-          if (global_count < 18) {LCD.print(all_parameters[id][global_count]);}
+          if (global_count < 18) {
+            LCD.print(all_parameters[id][global_count]);
+          }
           if (global_count > 17) {
-            if (valminimax[1][global_count] == 10) {scale_value_switch(1);}
-            if (global_count == 22 or global_count == 40 or global_count == 53) {scale_value_switch(2);}
-            if (global_count != 22 or global_count != 40 or global_count != 53 or valminimax[1][global_count] != 10 or global_count != 42) {LCD.print(all_parameters[id][global_count]);}
-            if (global_count == 42) {scale_value_switch(3);}
+            if (valminimax[1][global_count] == 10) {
+              Scale_value_switch(1);
+            }
+            if (global_count == 22 or global_count == 40 or global_count == 53) {
+              Scale_value_switch(2);
+            }
+            if (global_count != 22 or global_count != 40 or global_count != 53 or valminimax[1][global_count] != 10 or global_count != 42) {
+              LCD.print(all_parameters[id][global_count]);
+            }
+            if (global_count == 42) {
+              Scale_value_switch(3);
+            }
           }
           val2 = -1;
         } 
       }
-      if(global_count == 55) {LCD.print(all_parameters[id][55]); val2 = -1;}
-      if(global_count == 56) {LCD.print(all_parameters[id][56]); val2 = -1;} 
+      if(global_count == 55) {
+        LCD.print(all_parameters[id][55]); 
+        val2 = -1;
+      }
+      if(global_count == 56) {
+        LCD.print(all_parameters[id][56]); 
+        val2 = -1;
+      } 
     break;
     case 2 :
         LCD.setCursor(0,0);
         if (line1_lcd_text != "P  B   AMPERO II") {
-            line1_lcd_text  = "P  B   AMPERO II"; 
+          line1_lcd_text  = "P  B   AMPERO II"; 
           LCD.print(line1_lcd_text);
           LCD.setCursor(4,0); LCD.print(bank);
         }
-        text = String(choiced_foot_on_pacer) + " ";LCD.setCursor(1,0); LCD.print(text);
+        text = String(choiced_foot_on_pacer) + " ";
+        LCD.setCursor(1,0); 
+        LCD.print(text);
         LCD.setCursor(0,1);
-        if (line2_lcd_text != ampero_quick_names[ampero_count]) {line2_lcd_text = ampero_quick_names[ampero_count]; LCD.print(line2_lcd_text);}
-        LCD.setCursor(13,1); LCD.print("   ");
+        if (line2_lcd_text != ampero_quick_names[ampero_count]) {
+          line2_lcd_text = ampero_quick_names[ampero_count]; 
+          LCD.print(line2_lcd_text);
+        }
+        LCD.setCursor(13,1); 
+        LCD.print("   ");
         LCD.setCursor(13,1);
         if (val2 == 1399 or val2 == 1400) {
-          if (val2 == 1399) {LCD.setCursor(10,1); LCD.print(":  PRE"); val2 = 1399;}
-          else {LCD.setCursor(10,1); LCD.print(": POST"); val2 = 1400;}
+            if (val2 == 1399) {LCD.setCursor(10,1); 
+              LCD.print(":  PRE"); 
+              val2 = 1399;
+            }
+          else {
+            LCD.setCursor(10,1); 
+            LCD.print(": POST"); 
+            val2 = 1400;
+          }
         }
         if (val2 == 1300 or val2 == 1299) {
-          if (val2 == 1300) {LCD.print("ON "); val2 = 1300;}
-          else {LCD.print("OFF"); val2 = 1299;}
+          if (val2 == 1300) {
+            LCD.print("ON "); 
+            val2 = 1300;
+          }
+          else {
+            LCD.print("OFF"); 
+            val2 = 1299;
+          }
         }
-        if (all_parameters[id][ampero_quick_values[1][ampero_count]] < 128) {LCD.print(all_parameters[id][ampero_quick_values[1][ampero_count]]); val2 = -1;}
+        if (all_parameters[id][ampero_quick_values[1][ampero_count]] < 128) {
+          LCD.print(all_parameters[id][ampero_quick_values[1][ampero_count]]); 
+          val2 = -1;
+        }
     break;
     case 3 :
         LCD.setCursor(0,0);
         if (line1_lcd_text != "P  B      TONE_X") {
-            line1_lcd_text  = "P  B      TONE_X";
+          line1_lcd_text  = "P  B      TONE_X";
           LCD.print(line1_lcd_text);
           LCD.setCursor(4,0); LCD.print(bank);
         }
-        text = String(choiced_foot_on_pacer) + " ";LCD.setCursor(1,0); LCD.print(text);
+        text = String(choiced_foot_on_pacer) + " ";
+        LCD.setCursor(1,0); 
+        LCD.print(text);
         LCD.setCursor(0,1);
-        if (line2_lcd_text != tonex_quick_names[tonex_count]) {line2_lcd_text = tonex_quick_names[tonex_count]; LCD.print(line2_lcd_text);}
-        LCD.setCursor(13,1); LCD.print("   ");
+        if (line2_lcd_text != tonex_quick_names[tonex_count]) {
+          line2_lcd_text = tonex_quick_names[tonex_count]; 
+          LCD.print(line2_lcd_text);
+        }
+        LCD.setCursor(13,1); 
+        LCD.print("   ");
         LCD.setCursor(13,1);
-        if (val2 == 1399 or val2 == 1400) {if (val2 == 1399) {LCD.setCursor(10,1); LCD.print(":  PRE"); val2 = 1399;}
-          else {LCD.setCursor(10,1); LCD.print(": POST"); val2 = 1400;}}
+        if (val2 == 1399 or val2 == 1400) {
+          if (val2 == 1399) {
+            LCD.setCursor(10,1); 
+            LCD.print(":  PRE"); 
+            val2 = 1399;
+          }
+          else {
+            LCD.setCursor(10,1); 
+            LCD.print(": POST"); 
+            val2 = 1400;
+          }
+        }
         if (val2 == 1299 or val2 == 1300) {
-          if (val2 == 1300) {LCD.print("ON "); val2 = 1300;}
-          else {LCD.print("OFF"); val2 = 1299;}
+          if (val2 == 1300) {
+            LCD.print("ON ");
+            val2 = 1300;
+          }
+          else {
+            LCD.print("OFF");
+            val2 = 1299;
+          }
         }
         if (all_parameters[id][tonex_quick_values[1][tonex_count]] < 128) {
           global_count = tonex_quick_values[1][tonex_count];
           //LCD.print(all_parameters[id][global_count]);
-          if (valminimax[1][global_count] == 10) {scale_value_switch(1);}
-          if (global_count == 22 or global_count == 40 or global_count == 53) {scale_value_switch(2);}
-          if (global_count != 22 or global_count != 40 or global_count != 53 or valminimax[1][global_count] != 10 or global_count != 42) {LCD.print(all_parameters[id][global_count]);}
-          if (global_count == 42) {scale_value_switch(3);}
+          if (valminimax[1][global_count] == 10) {
+            Scale_value_switch(1);
+          }
+          if (global_count == 22 or global_count == 40 or global_count == 53) {
+            Scale_value_switch(2);
+          }
+          if (global_count != 22 or global_count != 40 or global_count != 53 or valminimax[1][global_count] != 10 or global_count != 42) {
+            LCD.print(all_parameters[id][global_count]);
+          }
+          if (global_count == 42) {
+            Scale_value_switch(3);
+          }
           val2 = -1;
         }
     break;
@@ -348,8 +442,12 @@ void Screens(byte screen_choice, int val2) {
     case 8 :
       byte tmp3, tmp4;
       LCD.setCursor(13,1);
-      if (encoder2_copy_destination < 7) {tmp3 = 1;} if (encoder2_copy_destination > 6 && encoder2_copy_destination < 13) {tmp3 = 2;} if (encoder2_copy_destination > 12 && encoder2_copy_destination < 19) {tmp3 = 3;} if (encoder2_copy_destination > 18 && encoder2_copy_destination < 25) {tmp3 = 4;}
-      if (encoder2_copy_destination > 24 && encoder2_copy_destination < 31) {tmp3 = 5;} if (encoder2_copy_destination > 30 && encoder2_copy_destination < 37) {tmp3 = 6;}
+      if (encoder2_copy_destination < 7) {tmp3 = 1;} 
+      if (encoder2_copy_destination > 6 && encoder2_copy_destination < 13) {tmp3 = 2;} 
+      if (encoder2_copy_destination > 12 && encoder2_copy_destination < 19) {tmp3 = 3;} 
+      if (encoder2_copy_destination > 18 && encoder2_copy_destination < 25) {tmp3 = 4;}
+      if (encoder2_copy_destination > 24 && encoder2_copy_destination < 31) {tmp3 = 5;} 
+      if (encoder2_copy_destination > 30 && encoder2_copy_destination < 37) {tmp3 = 6;}
       if (encoder2_copy_destination == 1 or encoder2_copy_destination == 7  or encoder2_copy_destination == 13 or encoder2_copy_destination == 19 or encoder2_copy_destination == 25 or encoder2_copy_destination == 31) {tmp4 = 1;}
       if (encoder2_copy_destination == 2 or encoder2_copy_destination == 8  or encoder2_copy_destination == 14 or encoder2_copy_destination == 20 or encoder2_copy_destination == 26 or encoder2_copy_destination == 32) {tmp4 = 2;}
       if (encoder2_copy_destination == 3 or encoder2_copy_destination == 9  or encoder2_copy_destination == 15 or encoder2_copy_destination == 21 or encoder2_copy_destination == 27 or encoder2_copy_destination == 33) {tmp4 = 3;}
@@ -358,7 +456,6 @@ void Screens(byte screen_choice, int val2) {
       if (encoder2_copy_destination == 6 or encoder2_copy_destination == 12 or encoder2_copy_destination == 18 or encoder2_copy_destination == 24 or encoder2_copy_destination == 30 or encoder2_copy_destination == 36) {tmp4 = 6;}
       text = String(tmp3) + "-" + String(tmp4);
       LCD.print(text);
-      Serial.println(encoder2_copy_destination);
     break;
     case 9 :
       LCD.clear();
@@ -551,13 +648,16 @@ void inti_Encoders(int val1) {
       last_value_right_encoder = all_parameters[id][global_count];
     break;
     case 4 :
-      right_encoder.setCount(all_parameters[id][global_count]); last_value_right_encoder = all_parameters[id][global_count];
+      right_encoder.setCount(all_parameters[id][global_count]);
+      last_value_right_encoder = all_parameters[id][global_count];
     break;
     case 5 :
-      right_encoder.setCount(all_parameters[id][global_count]); last_value_right_encoder = all_parameters[id][global_count];
+      right_encoder.setCount(all_parameters[id][global_count]); 
+      last_value_right_encoder = all_parameters[id][global_count];
     break;
     case 6 :
-      right_encoder.setCount(all_parameters[id][global_count]); last_value_right_encoder = all_parameters[id][global_count];
+      right_encoder.setCount(all_parameters[id][global_count]); 
+      last_value_right_encoder = all_parameters[id][global_count];
     break;
     case 7 :
     encoder1_copy_source = 1;
@@ -653,19 +753,31 @@ void encoder_2_moved(int valmini, int valmaxi, int pot, byte sel){
       if (global_count != 55 or global_count != 56 or global_count != 54){ // Suppression reglage 54
         all_parameters[id][global_count] = pot;
         if (all_parameters[id][global_count] == 1399 or all_parameters[id][global_count] == 1400){
-          if (all_parameters[id][global_count] == 1399){midiblabla(global_control_change[global_count], 0, canal_midi_1);}
-          else {midiblabla(global_control_change[global_count], 127, canal_midi_1);}
+          if (all_parameters[id][global_count] == 1399){
+            midiblabla(global_control_change[global_count], 0, canal_midi_1);
+          }
+          else {
+            midiblabla(global_control_change[global_count], 127, canal_midi_1);
+          }
         }
         if (global_count > 17 && global_count < all_parameters[id][54]) {
-          if (all_parameters[id][global_count] == 1299){midiblabla(global_control_change[global_count], 0, canal_midi_1);}
-          if (all_parameters[id][global_count] == 1300){midiblabla(global_control_change[global_count], 127, canal_midi_1);}
+          if (all_parameters[id][global_count] == 1299){
+            midiblabla(global_control_change[global_count], 0, canal_midi_1);
+          }
+          if (all_parameters[id][global_count] == 1300){
+            midiblabla(global_control_change[global_count], 127, canal_midi_1);
+          }
           if (all_parameters[id][global_count] < 128){
             midiblabla(global_control_change[global_count], pot, canal_midi_1);
           }
         }
         if (global_count > 0 && global_count < 18) {
-          if (all_parameters[id][global_count] == 1299){midiblabla(global_control_change[global_count], 0, canal_midi_2);}
-          if (all_parameters[id][global_count] == 1300){midiblabla(global_control_change[global_count], 127, canal_midi_2);}
+          if (all_parameters[id][global_count] == 1299){
+            midiblabla(global_control_change[global_count], 0, canal_midi_2);
+          }
+          if (all_parameters[id][global_count] == 1300){
+            midiblabla(global_control_change[global_count], 127, canal_midi_2);
+          }
           if (all_parameters[id][global_count] < 128){
             midiblabla(global_control_change[global_count], pot, canal_midi_2);
           }
@@ -703,32 +815,71 @@ void common_carroussel(){
     inti_Encoders(2);
     if (global_count == 55){inti_Encoders(4);}
     if (global_count == 56){inti_Encoders(5);}
-    if (global_count != 55 && global_count !=56){inti_Encoders(6);}
-    if (last_value_left_encoder != left_encoder.getCount()) {encoder_1_moved(1,56,global_count,1); } 
+    if (global_count != 55 && global_count !=56){
+      inti_Encoders(6);
+    }
+    if (last_value_left_encoder != left_encoder.getCount()) {
+      encoder_1_moved(1,56,global_count,1); 
+    } 
     if (last_value_right_encoder != right_encoder.getCount()) {
       if (global_count != 55 && global_count != 56) {
         if (all_parameters[id][global_count] == 1399 or all_parameters[id][global_count] == 1400){
-          if (all_parameters[id][global_count] == 1400) {tmp = 1400; encvalMax = 1400; encvalMini = 1399;}
-          else {tmp = 1399; encvalMax = 1400; encvalMini = 1399;}
+          if (all_parameters[id][global_count] == 1400) {
+            tmp = 1400; 
+            encvalMax = 1400; 
+            encvalMini = 1399;
+          }
+          else {
+            tmp = 1399; 
+            encvalMax = 1400; 
+            encvalMini = 1399;
+          }
         }
         if (all_parameters[id][global_count] == 1299 or all_parameters[id][global_count] == 1300){
-          if (all_parameters[id][global_count] == 1300) {tmp = 1300; encvalMax = 1300; encvalMini = 1299;}
-          else {tmp = 1299; encvalMax = 1300; encvalMini = 1299;}
+          if (all_parameters[id][global_count] == 1300) {
+            tmp = 1300; 
+            encvalMax = 1300; 
+            encvalMini = 1299;
+          }
+          else {
+            tmp = 1299; 
+            encvalMax = 1300; 
+            encvalMini = 1299;
+          }
         }
         if (all_parameters[id][global_count] < 128){
-          if (all_parameters[id][global_count] < 128) {tmp = -1; encvalMax = global_control_change_max_values[global_count]; encvalMini = 0; }
+          if (all_parameters[id][global_count] < 128) {
+            tmp = -1; 
+            encvalMax = global_control_change_max_values[global_count]; 
+            encvalMini = 0; 
+          }
         }
       } 
       else {
-        if (all_parameters[id][55] < 128 && global_count == 55){tonex_bank_choice = 0;}
-        if (all_parameters[id][56] < 128 && global_count == 56){ampero_bank_choice =  0;}
-        if (all_parameters[id][55] > 127 && all_parameters[id][55] < 151 && global_count == 55){tonex_bank_choice = 1;}
-        if (all_parameters[id][56] > 127 && all_parameters[id][56] < 257 && global_count == 56){ampero_bank_choice = 1;}
-        if (all_parameters[id][56] > 255 && all_parameters[id][56] < 301 && global_count == 56){ampero_bank_choice = 2;}
-        tmp = -1; encvalMax = global_control_change_max_values[global_count]; encvalMini = 0; 
+        if (all_parameters[id][55] < 128 && global_count == 55){
+          tonex_bank_choice = 0;
+        }
+        if (all_parameters[id][56] < 128 && global_count == 56){
+          ampero_bank_choice =  0;
+        }
+        if (all_parameters[id][55] > 127 && all_parameters[id][55] < 151 && global_count == 55){
+          tonex_bank_choice = 1;
+        }
+        if (all_parameters[id][56] > 127 && all_parameters[id][56] < 257 && global_count == 56){
+          ampero_bank_choice = 1;
+        }
+        if (all_parameters[id][56] > 255 && all_parameters[id][56] < 301 && global_count == 56){
+          ampero_bank_choice = 2;
+        }
+        tmp = -1; encvalMax = global_control_change_max_values[global_count];
+        encvalMini = 0; 
       }
-    if (global_count != 42 && global_count != 54){encoder_2_moved(encvalMini,encvalMax,global_count,1);}
-    if (global_count == 42){encoder_2_moved(0,global_control_change_max_values[global_count],global_count,2);}    
+    if (global_count != 42 && global_count != 54){
+      encoder_2_moved(encvalMini,encvalMax,global_count,1);
+    }
+    if (global_count == 42){
+      encoder_2_moved(0,global_control_change_max_values[global_count],global_count,2);
+    }    
     Screens(1, tmp);
     }
     if (digitalRead(5) == 0) {
@@ -738,10 +889,22 @@ void common_carroussel(){
         idcopy = id;
         saveData(); delay(250);
         ampero_count = 0; tonex_count = 0; 
-        if(global_count<18) {initial_state = 2;} else{initial_state = 3;} break;
+        if(global_count<18) {
+          initial_state = 2;
+        } 
+        else{
+          initial_state = 3;
+        } 
+        break;
       }
       ampero_count = 0; tonex_count = 0; 
-      if(global_count<18) {initial_state = 2;} else{initial_state = 3;} break;
+      if(global_count<18) {
+        initial_state = 2;
+      } 
+      else{
+        initial_state = 3;
+        } 
+      break;
     }
     if (digitalRead(23) == 0) {
       delay(250);
@@ -750,10 +913,22 @@ void common_carroussel(){
         idcopy = id;
         saveData(); delay(250);
         ampero_count = 0; tonex_count = 0; 
-        if(global_count<18) {initial_state = 2;} else{initial_state = 3;} break;
+        if(global_count<18) {
+          initial_state = 2;
+        } 
+        else{
+          initial_state = 3;
+        } 
+      break;
       }
       ampero_count = 0; tonex_count = 0; 
-      if(global_count<18) {initial_state = 2;} else{initial_state = 3;} break;
+      if(global_count<18) {
+        initial_state = 2;
+      }
+      else{
+        initial_state = 3;
+      }
+      break;
     }
   }
   previousMillis = millis(); tmp2 = 1;
@@ -764,22 +939,42 @@ void pressed_boutton(byte boutton_choiced, byte menu_choiced) {
     case 1 :
       switch (menu_choiced) {
         case 0 :
-          if (initial_state == 1){ampero_count = 0; initial_state = 0;}
+          if (initial_state == 1){
+            ampero_count = 0; initial_state = 0;
+          }
           if (ampero_count > 0 && ampero_count < 6) {
             ampero_count = ampero_count+1;
           }
-          else {ampero_count = 1; tonex_count = 1;}
+          else {
+            ampero_count = 1;
+            tonex_count = 1;
+          }
           inti_Encoders(1);
           if (all_parameters[id][ampero_quick_values[1][ampero_count]] > 1390){
-            if (all_parameters[id][ampero_quick_values[1][ampero_count]] == 1399) {tmp = 1399;}
-            else {tmp = 1400;}
+            if (all_parameters[id][ampero_quick_values[1][ampero_count]] == 1399) {
+              tmp = 1399;
+              }
+            else {
+              tmp = 1400;
+            }
           }
           if (all_parameters[id][ampero_quick_values[1][ampero_count]] > 1290 && all_parameters[id][ampero_quick_values[1][ampero_count]] < 1305) {
-            if (all_parameters[id][ampero_quick_values[1][ampero_count]] == 1300) {tmp = 1300;}
-            else {tmp = 1299;}
+            if (all_parameters[id][ampero_quick_values[1][ampero_count]] == 1300) {
+              tmp = 1300;
+            }
+            else {
+              tmp = 1299;
+            }
           } 
-          if (all_parameters[id][ampero_quick_values[1][ampero_count]] < 1000) {tmp = -1;}
-          if (startscreen != 1) {Screens(2, tmp);} else {startscreen = 0;}
+          if (all_parameters[id][ampero_quick_values[1][ampero_count]] < 1000) {
+            tmp = -1;
+          }
+          if (startscreen != 1) {
+            Screens(2, tmp);
+          }
+          else {
+            startscreen = 0;
+          }
           //displayColor1(rgbcolor[ampero_count]);
           break;
         case 1 : 
@@ -792,22 +987,39 @@ void pressed_boutton(byte boutton_choiced, byte menu_choiced) {
     case 2 :
       switch (menu_choiced) {
         case 0 : 
-          if (initial_state == 1){tonex_count = 0; initial_state = 0;}
+          if (initial_state == 1){
+            tonex_count = 0; 
+            initial_state = 0;
+          }
           if (tonex_count > 0 && tonex_count < 6) {
             tonex_count = tonex_count+1;
           }
           else {tonex_count = 1; ampero_count = 1;}
           inti_Encoders(1);
           if (all_parameters[id][tonex_quick_values[1][tonex_count]] > 1390){
-            if (all_parameters[id][tonex_quick_values[1][tonex_count]] == 1399) {tmp = 1399;}
-            else {tmp = 1400;}
+            if (all_parameters[id][tonex_quick_values[1][tonex_count]] == 1399) {
+              tmp = 1399;
+            }
+            else {
+              tmp = 1400;
+            }
           }
           if (all_parameters[id][tonex_quick_values[1][tonex_count]] > 1290 && all_parameters[id][tonex_quick_values[1][tonex_count]] > 1305) {
-              if (all_parameters[id][tonex_quick_values[1][tonex_count]] == 1300) {tmp = 1300;}
-              else {tmp = 1299;}
+              if (all_parameters[id][tonex_quick_values[1][tonex_count]] == 1300) {
+                tmp = 1300;
+              }
+              else {
+                tmp = 1299;
+              }
             }
-          if (all_parameters[id][tonex_quick_values[1][tonex_count]] > 1000) {tmp = -1;}
-          if (startscreen != 1) {Screens(3, tmp);} else {startscreen = 0;}
+          if (all_parameters[id][tonex_quick_values[1][tonex_count]] > 1000) {
+            tmp = -1;
+          }
+          if (startscreen != 1) {
+            Screens(3, tmp);
+          } else {
+            startscreen = 0;
+          }
           // displayColor1(rgbcolor[tonex_count]);
         break;
         case 1 :
@@ -827,9 +1039,15 @@ void Save_patch_to_selected_patch(){
   k = id_values_for_6_foot[encoder2_copy_destination];
   for (k ; k < id_values_for_6_foot[encoder2_copy_destination]+7; k++ && l++) {
     for (j = 1; j < 60; j++){
-      if (j != 55 or j != 56) {temp_transfert_datas[j] = all_parameters[l][j];}
-      if (j == 55) {temp_transfert_datas[j] = all_parameters[l][55];}
-      if (j == 56) {temp_transfert_datas[j] = all_parameters[l][56];}
+      if (j != 55 or j != 56) {
+        temp_transfert_datas[j] = all_parameters[l][j];
+      }
+      if (j == 55) {
+        temp_transfert_datas[j] = all_parameters[l][55];
+      }
+      if (j == 56) {
+        temp_transfert_datas[j] = all_parameters[l][56];
+      }
     }
     //Serial.println("");Serial.print(" ID = ");Serial.println(l);
     idcopy = k;
@@ -854,17 +1072,23 @@ void init_copy_patch(){
       if(bank == 5){encoder_1_moved(25,30,encoder1_copy_source,2);}
       if(bank == 6){encoder_1_moved(31,36,encoder1_copy_source,2);}
     } 
-    if (last_value_right_encoder != right_encoder.getCount()) {encoder_2_moved(1,36,encoder2_copy_destination,3);} 
+    if (last_value_right_encoder != right_encoder.getCount()) {
+      encoder_2_moved(1,36,encoder2_copy_destination,3);
+    } 
     if (digitalRead(5) == 0) {
       delay(250);
-      if (digitalRead(23) == 0) {Save_patch_to_selected_patch();}
+      if (digitalRead(23) == 0) {
+        Save_patch_to_selected_patch();
+      }
       ampero_count = 0; tonex_count = 0;
       initial_state = 2;
       break;
     }
     if (digitalRead(23) == 0) {
       delay(250);
-      if (digitalRead(5) == 0) {Save_patch_to_selected_patch();}
+      if (digitalRead(5) == 0) {
+        Save_patch_to_selected_patch();
+      }
       ampero_count = 0; tonex_count = 0; 
       initial_state = 3;
       break;
@@ -882,7 +1106,9 @@ void pre_Save_scenes(){
   if (bank == 4){m = id_values_for_6_foot[encoder1_copy_source+18];}
   if (bank == 5){m = id_values_for_6_foot[encoder1_copy_source+24];}
   if (bank == 6){m = id_values_for_6_foot[encoder1_copy_source+30];}
-  for (j = id_values_for_6_foot[encoder1_copy_source]; j < id_values_for_6_foot[encoder1_copy_source]+7; j++ && m++){idcopy = m; Save_scenes();
+  for (j = id_values_for_6_foot[encoder1_copy_source]; j < id_values_for_6_foot[encoder1_copy_source]+7; j++ && m++){
+    idcopy = m; 
+    Save_scenes();
   }
   ampero_count = 0; tonex_count = 0;
 }
@@ -971,8 +1197,14 @@ void load_preset() {
   if (all_parameters[id][55] != all_parameters[preid][55]) {program_change(tonex_bank_choice, all_parameters[id][55], canal_midi_1); }
   
   for (i = 1; i < 18; i++){
-    if (all_parameters[id][56] != all_parameters[preid][56]) {load_Ampero(); tmp5 = 1;}
-    if (all_parameters[id][i] != all_data_base_parameters_copy[preid][i] && tmp5 == 0) {load_Ampero(); tmp5 = 0;}
+    if (all_parameters[id][56] != all_parameters[preid][56]) {
+      load_Ampero();
+      tmp5 = 1;
+    }
+    if (all_parameters[id][i] != all_data_base_parameters_copy[preid][i] && tmp5 == 0) {
+      load_Ampero(); 
+      tmp5 = 0;
+    }
   }
   tmp5 = 0;
   //Serial.print(" // "); 
@@ -1177,18 +1409,44 @@ void loop(){
   button7.tick();
   button8.tick();
   if (last_value_left_encoder != left_encoder.getCount()) {
-    if (ampero_count == 0) {ampero_count = 1;}
+    if (ampero_count == 0) {
+      ampero_count = 1;
+    }
     encoder_1_moved(values_mini_ampero_quick[ampero_count],values_max_ampero_quick[ampero_count],all_parameters[id][ampero_quick_values[1][ampero_count]],0);
     line2_lcd_text, line1_lcd_text = "toto";
   }  
   if (last_value_right_encoder != right_encoder.getCount()) {
-    if (tonex_count == 0) {tonex_count = 1;}
-    if (tonex_count != 0) {encoder_2_moved(values_mini_tonex_quick[tonex_count],values_max_tonex_quick[tonex_count],all_parameters[id][tonex_quick_values[1][tonex_count]],0);}
+    if (tonex_count == 0) {
+      tonex_count = 1;
+    }
+    if (tonex_count != 0) {
+      encoder_2_moved(values_mini_tonex_quick[tonex_count],values_max_tonex_quick[tonex_count],all_parameters[id][tonex_quick_values[1][tonex_count]],0);
+    }
     line2_lcd_text, line1_lcd_text = "toto";
   }
   MIDI.read();
-  if (initial_state == 2) {initial_state = 0; menus = 0; line1_lcd_text = "toto"; line2_lcd_text = "toto"; pressed_boutton(1, menus); Screens(2, 0);}  
-  if (initial_state == 3) {initial_state = 0; menus = 0; line1_lcd_text = "toto"; line2_lcd_text = "toto"; pressed_boutton(2, menus); Screens(3, 0);}
-  if (millis() - previousMillis >= interval && tmp2 == 1) {Screens(4, 0); tmp2 = 0; line1_lcd_text = "toto"; line2_lcd_text = "toto";}
+  if (initial_state == 2) {
+    initial_state = 0;
+    menus = 0; 
+    line1_lcd_text = "toto"; 
+    line2_lcd_text = "toto"; 
+    pressed_boutton(1, menus); 
+    Screens(2, 0);
+  }  
+  if (initial_state == 3) {
+    initial_state = 0; 
+    menus = 0; 
+    line1_lcd_text = "toto"; 
+    line2_lcd_text = "toto"; 
+    pressed_boutton(2, 
+    menus); 
+    Screens(3, 0);
+  }
+  if (millis() - previousMillis >= interval && tmp2 == 1) {
+    Screens(4, 0); 
+    tmp2 = 0; 
+    line1_lcd_text = "toto"; 
+    line2_lcd_text = "toto";
+  }
 }
 
