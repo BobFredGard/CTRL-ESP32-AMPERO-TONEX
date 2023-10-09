@@ -1115,6 +1115,7 @@ void Init_copy_scenes(){
   encoder2_copy_destination = 1;
   inti_Encoders(7);
   while (menus == 2){
+    server.handleClient();
     if (tmp == 1) {
       Screens(12, 0); 
       CopyPathScene ();
