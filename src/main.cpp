@@ -410,7 +410,7 @@ void Screens (byte screen_choice, int val2) {
     case 4 :
       LCD.clear();
       LCD.setCursor(0,0);
-      LCD.print("choiced_foot_on_pacer :  |Bank:  ");
+      LCD.print("Pied :  |Bank:  ");
       LCD.setCursor(7,0);
       LCD.print(choiced_foot_on_pacer);
       LCD.setCursor(15,0);
