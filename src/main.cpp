@@ -17,6 +17,7 @@ IPAddress ip;
 #include <ESP32WebServer.h>
 ESP32WebServer server(80);
 #include <ESPmDNS.h>
+#include <DataServer.h>
 
 #include <sqlite3.h>
 sqlite3 *db_base;
@@ -65,6 +66,7 @@ static int initial_state, boutton_choice, encoder1_copy_source, encoder2_copy_de
 static short canal_midi_2 = 7; static short canal_midi_1 = 8;
 static int preid = -1;
 static int ampero_bank_choice, tonex_bank_choice = 0;
+static byte tx1, tx2, tx3 = 1;
 
 unsigned long previousMillis = 0;
 unsigned long interval = 3000;
@@ -204,6 +206,7 @@ void Scale_value_switch (byte val3) {
   }
 }
 
+#include"ChoixCopyPatch.h"
 void Screens (byte screen_choice, int val2) {
   //LCD.clear();
   String text;
@@ -423,39 +426,27 @@ void Screens (byte screen_choice, int val2) {
     case 5 :
       LCD.clear();
       LCD.setCursor(0,0);
-      LCD.print("***  RESTART ***");
+      LCD.print("***** LOAD *****");
       LCD.setCursor(0,1);
-      LCD.print("***** WAIT *****");
+      LCD.print("**** PATCHS ****");
     break;
     case 6 :
       LCD.clear();
       LCD.setCursor(0,0);
       LCD.print(" Copy PATCH : ");
       LCD.setCursor(0,1);
-      LCD.print("...To PATCH : ");
+      LCD.print("To Bk-PATCH : ");
     break;
     case 7 :
       LCD.setCursor(14,0);
       LCD.print(encoder1_copy_source);
-      if (encoder1_copy_source < 10) {LCD.setCursor(15,0); LCD.print(" ");}
+      if (encoder1_copy_source < 10) {
+        LCD.setCursor(15,0); 
+        LCD.print(" ");
+      }
     break;
     case 8 :
-      byte tmp3, tmp4;
-      LCD.setCursor(13,1);
-      if (encoder2_copy_destination < 7) {tmp3 = 1;} 
-      if (encoder2_copy_destination > 6 && encoder2_copy_destination < 13) {tmp3 = 2;} 
-      if (encoder2_copy_destination > 12 && encoder2_copy_destination < 19) {tmp3 = 3;} 
-      if (encoder2_copy_destination > 18 && encoder2_copy_destination < 25) {tmp3 = 4;}
-      if (encoder2_copy_destination > 24 && encoder2_copy_destination < 31) {tmp3 = 5;} 
-      if (encoder2_copy_destination > 30 && encoder2_copy_destination < 37) {tmp3 = 6;}
-      if (encoder2_copy_destination == 1 or encoder2_copy_destination == 7  or encoder2_copy_destination == 13 or encoder2_copy_destination == 19 or encoder2_copy_destination == 25 or encoder2_copy_destination == 31) {tmp4 = 1;}
-      if (encoder2_copy_destination == 2 or encoder2_copy_destination == 8  or encoder2_copy_destination == 14 or encoder2_copy_destination == 20 or encoder2_copy_destination == 26 or encoder2_copy_destination == 32) {tmp4 = 2;}
-      if (encoder2_copy_destination == 3 or encoder2_copy_destination == 9  or encoder2_copy_destination == 15 or encoder2_copy_destination == 21 or encoder2_copy_destination == 27 or encoder2_copy_destination == 33) {tmp4 = 3;}
-      if (encoder2_copy_destination == 4 or encoder2_copy_destination == 10 or encoder2_copy_destination == 16 or encoder2_copy_destination == 22 or encoder2_copy_destination == 28 or encoder2_copy_destination == 34) {tmp4 = 4;}
-      if (encoder2_copy_destination == 5 or encoder2_copy_destination == 11 or encoder2_copy_destination == 17 or encoder2_copy_destination == 23 or encoder2_copy_destination == 29 or encoder2_copy_destination == 35) {tmp4 = 5;}
-      if (encoder2_copy_destination == 6 or encoder2_copy_destination == 12 or encoder2_copy_destination == 18 or encoder2_copy_destination == 24 or encoder2_copy_destination == 30 or encoder2_copy_destination == 36) {tmp4 = 6;}
-      text = String(tmp3) + "-" + String(tmp4);
-      LCD.print(text);
+      ChoixCopyPatch ();
     break;
     case 9 :
       LCD.clear();
@@ -483,9 +474,9 @@ void Screens (byte screen_choice, int val2) {
     case 12 :
       LCD.clear();
       LCD.setCursor(0,0);
-      LCD.print("Copy Patch :    ");
+      LCD.print("Copy Scene :    ");
       LCD.setCursor(0,1);
-      LCD.print("<-DATA ** COPY->");
+      LCD.print("to b/p/s :      ");
     break;
     case 13 :
       LCD.clear();
@@ -496,8 +487,10 @@ void Screens (byte screen_choice, int val2) {
     break;
     case 14 :
       LCD.clear();
-      LCD.setCursor(13,0);
-      LCD.print(encoder1_copy_source);
+      LCD.setCursor(0,0);
+      LCD.print("** Copy Scene **");
+      LCD.setCursor(0,1);
+      LCD.print("*** en cours ***");
     break;
   }
 }
@@ -559,23 +552,6 @@ void saveData() {
   Serial.println(slq_request);
 }
 
-void Save_copied_patch() {
-  if (db_open("/spiffs/base.db", &db_base)) return;
-  slq_request = "UPDATE stomps SET ";
-  for (i = 1; i < 60; i++){
-    if (i < 58){
-      slq_request += "'"+String(i)+"'="+String(temp_transfert_datas[i])+", ";
-    }
-    if (i == 58){
-      slq_request += "'"+String(i)+"'="+String(temp_transfert_datas[i]); 
-    }
-  }
-  slq_request += " WHERE stomps_id="+String(idcopy)+";";
-  db_exec(db_base, slq_request.c_str());
-  sqlite3_close(db_base);
-  Serial.println(slq_request);
-}
-
 void Save_scenes() {
   if (l == 1) { //Data Read Only
     slq_request = "UPDATE stomps SET ";
@@ -629,6 +605,10 @@ void readData (){
 // ------------------------------------------FIN GESTTION BASE DE DONNEE
 
 // ---------------------------------------------------------------ECRANS
+
+#include"RecupPathScene.h"
+#include"CopyPathScene.h"
+
 void inti_Encoders(int val1) {
   switch (val1)  {
     case 1 :
@@ -660,8 +640,6 @@ void inti_Encoders(int val1) {
       last_value_right_encoder = all_parameters[id][global_count];
     break;
     case 7 :
-    encoder1_copy_source = 1;
-    encoder2_copy_destination = 2;
       left_encoder.setCount(encoder1_copy_source);
       last_value_left_encoder = encoder1_copy_source;
       right_encoder.setCount(encoder2_copy_destination);
@@ -720,7 +698,7 @@ void encoder_1_moved(int valmini, int valmaxi, int pot, byte sel){
       encoder1_copy_source = pot;
       left_encoder.setCount(pot);
       last_value_left_encoder = pot;
-      Screens(14, encoder1_copy_source);
+      CopyPathScene ();
     break;
   }
   previousMillis = millis(); tmp2 = 1;
@@ -803,6 +781,15 @@ void encoder_2_moved(int valmini, int valmaxi, int pot, byte sel){
       right_encoder.setCount(pot);
       last_value_right_encoder = pot;
       Screens(8, encoder2_copy_destination);
+    break;
+    case 4 :
+      pot = right_encoder.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      encoder2_copy_destination = pot;
+      right_encoder.setCount(pot);
+      last_value_right_encoder = pot;
+      RecupPathScene ();
     break;
   }
   previousMillis = millis(); tmp2 = 1;
@@ -1038,29 +1025,31 @@ void Save_patch_to_selected_patch(){
   l = id_values_for_6_foot[encoder1_copy_source];
   k = id_values_for_6_foot[encoder2_copy_destination];
   for (k ; k < id_values_for_6_foot[encoder2_copy_destination]+7; k++ && l++) {
-    for (j = 1; j < 60; j++){
-      if (j != 55 or j != 56) {
-        temp_transfert_datas[j] = all_parameters[l][j];
+    if (db_open("/spiffs/base.db", &db_base)) return;
+    slq_request = "UPDATE stomps SET ";
+    for (i = 1; i < 60; i++){
+      if (i < 58){
+        slq_request += "'"+String(i)+"'="+String(all_parameters[l][i])+", ";
       }
-      if (j == 55) {
-        temp_transfert_datas[j] = all_parameters[l][55];
-      }
-      if (j == 56) {
-        temp_transfert_datas[j] = all_parameters[l][56];
+      if (i == 58){
+        slq_request += "'"+String(i)+"'="+String(all_parameters[l][i]); 
       }
     }
-    //Serial.println("");Serial.print(" ID = ");Serial.println(l);
-    idcopy = k;
-    Save_copied_patch();
-    delay(50);
-  }  
+    slq_request += " WHERE stomps_id="+String(k)+";";
+    db_exec(db_base, slq_request.c_str());
+    sqlite3_close(db_base);
+    Serial.println(slq_request);
+  }
   Screens(5,0);
-  delay(800);
-  esp_restart();
+  //delay(800);
+  //esp_restart();
+  readData();
 }
 
 void init_copy_patch(){
   tmp = 1;
+  encoder1_copy_source = 1;
+  encoder2_copy_destination = 2;
   inti_Encoders(7);
   while (menus == 2){
     if (tmp == 1) {Screens(6, 0); Screens(7,0); Screens(8,0); tmp = 0;}
@@ -1096,50 +1085,68 @@ void init_copy_patch(){
   }
   previousMillis = millis(); tmp2 = 1;
 }
+                                      //    1 2  3  4  5  6   7  8  9 10 11 12  13 14 15  16  17  18   19  20  21  22  23  24   25  26  27  28  29  30   31  32  33  34  35  36 
+//static int id_values_for_6_foot [37] = {0,1,8,15,22,29,36, 43,50,57,64,71,78, 85,92,99,106,113,120, 127,134,141,148,155,162, 169,176,183,190,197,204, 211,218,225,232,239,246};
 
-void pre_Save_scenes(){
-  Screens(13, 0);               //  1 2  3  4  5  6   7  8  9 10 11 12  13 14 15  16  17  18   19  20  21  22  23  24   25  26  27  28  29  30   31  32  33  34  35  36 
-  //static int id_values_for_6_foot [37] = {0,1,8,15,22,29,36, 43,50,57,64,71,78, 85,92,99,106,113,120, 127,134,141,148,155,162, 169,176,183,190,197,204, 211,218,225,232,239,246};
-  if (bank == 1){m = id_values_for_6_foot[encoder1_copy_source];}
-  if (bank == 2){m = id_values_for_6_foot[encoder1_copy_source+6];}
-  if (bank == 3){m = id_values_for_6_foot[encoder1_copy_source+12];}
-  if (bank == 4){m = id_values_for_6_foot[encoder1_copy_source+18];}
-  if (bank == 5){m = id_values_for_6_foot[encoder1_copy_source+24];}
-  if (bank == 6){m = id_values_for_6_foot[encoder1_copy_source+30];}
-  for (j = id_values_for_6_foot[encoder1_copy_source]; j < id_values_for_6_foot[encoder1_copy_source]+7; j++ && m++){
-    idcopy = m; 
-    Save_scenes();
+void CopyDataScene () {
+  Screens(14,0);
+  if (db_open("/spiffs/base.db", &db_base)) return;
+  slq_request = "UPDATE stomps SET ";
+  for (i = 1; i < 60; i++){
+    if (i < 58){
+      slq_request += "'"+String(i)+"'="+String(all_parameters[encoder1_copy_source][i])+", ";
+    }
+    if (i == 58){
+      slq_request += "'"+String(i)+"'="+String(all_parameters[encoder1_copy_source][i]); 
+    }
   }
-  ampero_count = 0; tonex_count = 0;
+  slq_request += " WHERE stomps_id="+String(encoder2_copy_destination)+";";
+  db_exec(db_base, slq_request.c_str());
+  sqlite3_close(db_base);
+  Serial.println(slq_request);
+  Screens(5,0);
+  readData();
 }
 
-void Init_save_scenes(){
-  tmp = 1; l = 0;
+void Init_copy_scenes(){
+  int ct = 1;
+  tmp = 1;
+  encoder1_copy_source = id;
+  encoder2_copy_destination = 1;
+  inti_Encoders(7);
   while (menus == 2){
-    server.handleClient();
-    if (tmp == 1) {Screens(12, 0);tmp = 0;}
+    if (tmp == 1) {
+      Screens(12, 0); 
+      CopyPathScene ();
+      RecupPathScene ();
+      tmp = 0;
+    }
     if (last_value_left_encoder != left_encoder.getCount()) {
-      encoder_1_moved(1,6,encoder1_copy_source,2);
+      encoder_1_moved(1,42,encoder1_copy_source,3);
+    } 
+    if (last_value_right_encoder != right_encoder.getCount()) {
+      encoder_2_moved(1,252,encoder2_copy_destination,4);
     } 
     if (digitalRead(5) == 0) {
       delay(250);
-      if (digitalRead(5) == 0) {
-          l = 1;
-          pre_Save_scenes();
-        }
+      if (digitalRead(23) == 0) {
+        CopyDataScene();
+      }
+      ampero_count = 0; tonex_count = 0;
       initial_state = 2;
       break;
     }
     if (digitalRead(23) == 0) {
       delay(250);
-      if (digitalRead(23) == 0) {
-          l = 2;
-          pre_Save_scenes();
-        }
+      if (digitalRead(5) == 0) {
+        CopyDataScene();
+      }
+      ampero_count = 0; tonex_count = 0; 
       initial_state = 3;
       break;
     }
   }
+  previousMillis = millis(); tmp2 = 1;
 }
 
 void program_change_value(){
@@ -1261,77 +1268,6 @@ void handleControlChange(byte channel, byte number, byte value) {
   }
 }
 
-//---PARTIE WEB SERVER http://fileserver.local ou http://192.168.8.117
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void SendHTML_Header() {
-  server.sendHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  server.sendHeader("Pragma", "no-cache");
-  server.sendHeader("Expires", "-1");
-  server.setContentLength(CONTENT_LENGTH_UNKNOWN);
-  server.send(200, "text/html", ""); // Empty content inhibits Content-length header so we have to close the socket ourselves.
-  append_page_header();
-  server.sendContent(webpage);
-  webpage = "";
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void SendHTML_Stop() {
-  server.sendContent("");
-  server.client().stop(); // Stop is needed because no content length was sent
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void SendHTML_Content() {
-  server.sendContent(webpage);
-  webpage = "";
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void ReportFileNotPresent(String target) {
-  SendHTML_Header();
-  webpage += F("<h3>File does not exist</h3>");
-  webpage += F("<a href='/"); webpage += target + "'>[Back]</a><br><br>";
-  append_page_footer();
-  SendHTML_Content();
-  SendHTML_Stop();
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void SD_file_download(String filename) {
-  File download = SPIFFS.open("/" + filename, "r");
-  if (download) {
-    server.sendHeader("Content-Type", "text/text");
-    server.sendHeader("Content-Disposition", "attachment; filename=" + filename);
-    server.sendHeader("Connection", "close");
-    server.streamFile(download, "application/octet-stream");
-    download.close();
-  } else ReportFileNotPresent("download");
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void SelectInput(String heading1, String heading2, String command, String arg_calling_name) {
-  SendHTML_Header();
-  webpage += F("<h3 class='rcorners_m'>"); webpage += heading1 + "</h3><br>";
-  webpage += F("<h3>"); webpage += heading2 + "</h3>";
-  webpage += F("<FORM action='/"); webpage += command + "' method='post'>"; // Must match the calling argument e.g. '/chart' calls '/chart' after selection but with arguments!
-  webpage += F("<input type='text' name='"); webpage += arg_calling_name; webpage += F("' value=''><br>");
-  webpage += F("<type='submit' name='"); webpage += arg_calling_name; webpage += F("' value=''><br><br>");
-  append_page_footer();
-  SendHTML_Content();
-  SendHTML_Stop();
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void File_Download() { // This gets called twice, the first pass selects the input, the second pass then processes the command line arguments
-  if (server.args() > 0 ) { // Arguments were received
-    if (server.hasArg("download")) SD_file_download(server.arg(0));
-  }
-  else SelectInput("File Download", "Enter filename to download", "download", "download");
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-void HomePage() {
-  SendHTML_Header();
-  webpage += F("<a href='/download'><button>Download</button></a>");
-  append_page_footer();
-  SendHTML_Content();
-  SendHTML_Stop(); // Stop is needed because no content length was sent
-}
-
-
 void setup() {
   pinMode(33, OUTPUT); pinMode(32, OUTPUT); pinMode(25, OUTPUT);
 
@@ -1358,7 +1294,7 @@ void setup() {
   button7.attachLongPressStop([] () {line2_lcd_text = "toto"; menus = 1; boutton_choice = 1; pressed_boutton(1, menus);});
   button8.attachLongPressStop([] () {line2_lcd_text = "toto"; menus = 1; boutton_choice = 2; pressed_boutton(2, menus);});
 
-  button7.attachDoubleClick([] () {line2_lcd_text, line1_lcd_text = "toto"; menus = 2; Init_save_scenes();});
+  button7.attachDoubleClick([] () {line2_lcd_text, line1_lcd_text = "toto"; menus = 2; Init_copy_scenes();});
   button8.attachDoubleClick([] () {line2_lcd_text, line1_lcd_text = "toto"; menus = 2; init_copy_patch();});
 
   if(SPIFFS.begin(true)){
