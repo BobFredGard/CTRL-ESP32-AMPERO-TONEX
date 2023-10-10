@@ -522,7 +522,13 @@ static int db_exec(sqlite3 *db, const char *slq_request) {
 
 void saveData() {
   if (db_open("/spiffs/base.db", &db_base)) return;
-  slq_request = "UPDATE stomps SET ";
+    slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy)+", ";
+  if (bank == 1 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy)+", ";}
+  if (bank == 2 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy + 42)+", ";}
+  if (bank == 3 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy + 42 * 2)+", ";}
+  if (bank == 4 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy + 42 * 3)+", ";}
+  if (bank == 5 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy + 42 * 4)+", ";}
+  if (bank == 6 ) {slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(idcopy + 42 * 5)+", ";}
   for (i = 1; i < 57; i++){
     if (i < 56){
       //if (all_parameters[idcopy][i] != all_data_base_parameters_copy[idcopy][i]) {
@@ -544,49 +550,18 @@ void saveData() {
   Serial.println(slq_request);
 }
 
-void Save_scenes() {
-  if (l == 1) { //Data Read Only
-    slq_request = "UPDATE stomps SET ";
-    for (i = 1; i < 59; i++){
-      if (i < 58){
-      slq_request += "'"+String(i)+"'="+String(all_parameters[j][i])+", "; 
-      } 
-      if (i == 58){
-      slq_request += "'"+String(i)+"'="+String(all_parameters[j][i]);
-      }
-    }
-    slq_request += " WHERE stomps_id="+String(idcopy)+";";
-    Serial.println(slq_request);
-  }
-  if (l == 2) { // Copy Data Main -> 6 prochains
-    if (db_open("/spiffs/base.db", &db_base)) return;
-    slq_request = "UPDATE stomps SET ";
-    for (i = 1; i < 59; i++){
-      if (i < 58){
-      slq_request += "'"+String(i)+"'="+String(all_parameters[j][i])+", ";all_data_base_parameters_copy[j][i] = all_parameters[j][i];
-      } 
-      if (i == 58){
-      slq_request += "'"+String(i)+"'="+String(all_parameters[j][i]); all_data_base_parameters_copy[j][i] = all_parameters[j][i];
-      }
-    }
-    slq_request += " WHERE stomps_id="+String(idcopy)+";";
-    db_exec(db_base, slq_request.c_str());
-    sqlite3_close(db_base);
-    Serial.println(slq_request);
-  }
-}
-
 void readData (){
   data_base_choice = 0;
   if (db_open("/spiffs/base.db", &db_base)) return; 
   static byte o;
-  //Serial.print("Bank = "); Serial.println(bank);
-  if (bank == 1 ) {o = id;}
-  if (bank == 2 ) {o = id + 42;}
-  if (bank == 3 ) {o = id + 42*2;}
-  if (bank == 4 ) {o = id + 42*3;}
-  if (bank == 5 ) {o = id + 42*4;}
-  if (bank == 6 ) {o = id + 42*5;}
+  Serial.print("Bank = "); Serial.println(bank);
+  Serial.print("ID INIT = "); Serial.println(id_init);
+  if (bank == 1 ) {o = 1;}
+  if (bank == 2 ) {o = 1 + 42;}
+  if (bank == 3 ) {o = 1 + 42*2;}
+  if (bank == 4 ) {o = 1 + 42*3;}
+  if (bank == 5 ) {o = 1 + 42*4;}
+  if (bank == 6 ) {o = 1 + 42*5;}
   for (i = 1; i < 43; i++) {
     slq_request = "SELECT * FROM stomps WHERE stomps_id = " + String(o) + ";";
     db_exec(db_base, slq_request.c_str());
@@ -599,7 +574,8 @@ void readData (){
 // ---------------------------------------------------------------ECRANS
 
 #include"RecupPathScene.h"
-#include"CopyPathScene.h"
+#include"CopyPathScene.h" 
+#include"CopyPatch.h"
 
 void inti_Encoders(int val1) {
   switch (val1)  {
@@ -684,6 +660,15 @@ void encoder_1_moved(int valmini, int valmaxi, int pot, byte sel){
       Screens(7, encoder1_copy_source);
     break;
     case 3 :
+      pot = left_encoder.getCount();
+      if (pot > valmaxi) {pot = valmini;}
+      if (pot < valmini) {pot = valmaxi;}        
+      encoder1_copy_source = pot;
+      left_encoder.setCount(pot);
+      last_value_left_encoder = pot;
+      CopyPatch ();
+    break;
+    case 4 :
       pot = left_encoder.getCount();
       if (pot > valmaxi) {pot = valmini;}
       if (pot < valmini) {pot = valmaxi;}        
@@ -1013,12 +998,12 @@ void pressed_boutton(byte boutton_choiced, byte menu_choiced) {
 
 void Save_patch_to_selected_patch(){
   Screens(11,0);
-  //int j, k, l;
   l = id_values_for_6_foot[encoder1_copy_source];
   k = id_values_for_6_foot[encoder2_copy_destination];
   for (k ; k < id_values_for_6_foot[encoder2_copy_destination]+7; k++ && l++) {
+    Serial.print("ID copy = "); Serial.println(l);
     if (db_open("/spiffs/base.db", &db_base)) return;
-    slq_request = "UPDATE stomps SET ";
+    slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(k)+", ";
     for (i = 1; i < 60; i++){
       if (i < 58){
         slq_request += "'"+String(i)+"'="+String(all_parameters[l][i])+", ";
@@ -1031,6 +1016,7 @@ void Save_patch_to_selected_patch(){
     db_exec(db_base, slq_request.c_str());
     sqlite3_close(db_base);
     Serial.println(slq_request);
+    delay(100);
   }
   Screens(5,0);
   //delay(800);
@@ -1040,18 +1026,18 @@ void Save_patch_to_selected_patch(){
 
 void init_copy_patch(){
   tmp = 1;
-  encoder1_copy_source = 1;
+  encoder1_copy_source = choiced_foot_on_pacer;
   encoder2_copy_destination = 2;
   inti_Encoders(7);
   while (menus == 2){
     if (tmp == 1) {
       Screens(6, 0);
-      CopyPathScene ();
-      Screens(8,0); 
+      CopyPatch ();
+      Screens(8, encoder2_copy_destination);
       tmp = 0;
     }
     if (last_value_left_encoder != left_encoder.getCount()) {
-      encoder_1_moved(1,42,encoder1_copy_source,3);
+      encoder_1_moved(1,6,encoder1_copy_source,3);
     } 
     if (last_value_right_encoder != right_encoder.getCount()) {
       encoder_2_moved(1,36,encoder2_copy_destination,3);
@@ -1077,13 +1063,15 @@ void init_copy_patch(){
   }
   previousMillis = millis(); tmp2 = 1;
 }
-                                      //    1 2  3  4  5  6   7  8  9 10 11 12  13 14 15  16  17  18   19  20  21  22  23  24   25  26  27  28  29  30   31  32  33  34  35  36 
-//static int id_values_for_6_foot [37] = {0,1,8,15,22,29,36, 43,50,57,64,71,78, 85,92,99,106,113,120, 127,134,141,148,155,162, 169,176,183,190,197,204, 211,218,225,232,239,246};
+                  //    1 2  3  4  5  6   7  8  9 10 11 12  13 14 15  16  17  18   19  20  21  22  23  24   25  26  27  28  29  30   31  32  33  34  35  36 
+//static int  [37] = {0,1,8,15,22,29,36, 43,50,57,64,71,78, 85,92,99,106,113,120, 127,134,141,148,155,162, 169,176,183,190,197,204, 211,218,225,232,239,246};
 
 void CopyDataScene () {
   Screens(14,0);
   if (db_open("/spiffs/base.db", &db_base)) return;
-  slq_request = "UPDATE stomps SET ";
+  Serial.print("ID source = "); Serial.println(encoder1_copy_source);
+  Serial.print("ID copie  = "); Serial.println(encoder2_copy_destination);
+  slq_request = "UPDATE 'stomps' SET 'stomps_id'="+String(encoder2_copy_destination)+", ";
   for (i = 1; i < 60; i++){
     if (i < 58){
       slq_request += "'"+String(i)+"'="+String(all_parameters[encoder1_copy_source][i])+", ";
@@ -1115,7 +1103,7 @@ void Init_copy_scenes(){
       tmp = 0;
     }
     if (last_value_left_encoder != left_encoder.getCount()) {
-      encoder_1_moved(1,42,encoder1_copy_source,3);
+      encoder_1_moved(1,42,encoder1_copy_source,4);
     } 
     if (last_value_right_encoder != right_encoder.getCount()) {
       encoder_2_moved(1,252,encoder2_copy_destination,4);
