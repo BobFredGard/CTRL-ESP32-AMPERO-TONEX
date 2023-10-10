@@ -5,39 +5,17 @@
 };*/
 
 
-void CalculPathCopy (byte cpt) {
-    if (calculPathScene  [0] [encoder1_copy_source - cpt] == encoder1_copy_source - cpt) {
+void CopyPathScene () {
+    String text2;
+    if (calculPathScene  [0] [encoder1_copy_source] == encoder1_copy_source) {
         Serial.println(encoder1_copy_source);
-        tx2 = calculPathScene [2] [calculPathScene [0] [encoder1_copy_source - cpt]];
-        tx3 = calculPathScene [1] [calculPathScene [0] [encoder1_copy_source - cpt]];
+        tx2 = calculPathScene [2] [calculPathScene [0] [encoder1_copy_source]];
+        tx3 = calculPathScene [1] [calculPathScene [0] [encoder1_copy_source]];
     }
     else {
         Serial.println(encoder1_copy_source);
-        tx3 = calculPathScene [1] [calculPathScene [0] [encoder1_copy_source - cpt]];
+        tx3 = calculPathScene [1] [calculPathScene [0] [encoder1_copy_source]];
     }
-}
-
-void CopyPathScene () {
-    String text2;
-    if (bank == 1) {
-        CalculPathCopy (0);
-    }
-    if (bank == 2) {
-        CalculPathCopy (42);
-    }
-    if (bank == 3) {
-        CalculPathCopy (42*2);
-    }
-    if (bank == 4) {
-        CalculPathCopy (42*3);
-    }
-    if (bank == 5) {
-        CalculPathCopy (42*4);
-    }
-    if (bank == 6) {
-        CalculPathCopy (42*5);
-    }
-    
     LCD.setCursor(13,0);
     text2 = String(tx2) + "-" + String(tx3);
     LCD.print(text2);

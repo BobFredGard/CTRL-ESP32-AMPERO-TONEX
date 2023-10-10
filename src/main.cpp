@@ -437,14 +437,6 @@ void Screens (byte screen_choice, int val2) {
       LCD.setCursor(0,1);
       LCD.print("To Bk-PATCH : ");
     break;
-    case 7 :
-      LCD.setCursor(14,0);
-      LCD.print(encoder1_copy_source);
-      if (encoder1_copy_source < 10) {
-        LCD.setCursor(15,0); 
-        LCD.print(" ");
-      }
-    break;
     case 8 :
       ChoixCopyPatch ();
     break;
@@ -1052,14 +1044,14 @@ void init_copy_patch(){
   encoder2_copy_destination = 2;
   inti_Encoders(7);
   while (menus == 2){
-    if (tmp == 1) {Screens(6, 0); Screens(7,0); Screens(8,0); tmp = 0;}
+    if (tmp == 1) {
+      Screens(6, 0);
+      CopyPathScene ();
+      Screens(8,0); 
+      tmp = 0;
+    }
     if (last_value_left_encoder != left_encoder.getCount()) {
-      if(bank == 1){encoder_1_moved(1,6,encoder1_copy_source,2);}
-      if(bank == 2){encoder_1_moved(7,12,encoder1_copy_source,2);}
-      if(bank == 3){encoder_1_moved(13,18,encoder1_copy_source,2);}
-      if(bank == 4){encoder_1_moved(19,24,encoder1_copy_source,2);}
-      if(bank == 5){encoder_1_moved(25,30,encoder1_copy_source,2);}
-      if(bank == 6){encoder_1_moved(31,36,encoder1_copy_source,2);}
+      encoder_1_moved(1,42,encoder1_copy_source,3);
     } 
     if (last_value_right_encoder != right_encoder.getCount()) {
       encoder_2_moved(1,36,encoder2_copy_destination,3);
@@ -1115,7 +1107,7 @@ void Init_copy_scenes(){
   encoder2_copy_destination = 1;
   inti_Encoders(7);
   while (menus == 2){
-    server.handleClient();
+    server.handleClient(); 
     if (tmp == 1) {
       Screens(12, 0); 
       CopyPathScene ();
