@@ -23,6 +23,6 @@ J'ai aussi ajouté la fonction Copy Scene qui permet de copier n'importe quelle 
 
 En ce qui concerne le PACER, il envoit des 'ProgramChange' et des 'ControlChange' sur des canaux différents. Je me sers de ces valeurs envoyées pour déclencher mes propres évènements MIDI à destination de mes 2 appareils!
 
-2 'ProgramChange' sont envoyés aux 2 appareils si besoin!!! Tous les messages MIDI envoyés par le PACER sotn tous transmis tout le long de la chaîne MIDI, en passant par l'ESP32, puis vers l'Ampero et enfin vers le TonaX! Cela permet donc d'utiliser le PACER pour envoyer d'autres messages directement à ces 3 appareils!!!
+2 'ProgramChange' sont envoyés aux 2 appareils si besoin!!! Tous les messages MIDI envoyés par le PACER sont tous transmis tout le long de la chaîne MIDI, en passant par l'ESP32, puis vers l'Ampero et enfin vers le TonaX! Cela permet donc d'utiliser le PACER pour envoyer d'autres messages directement à ces 3 appareils!!!
 
 Je donne un fichier Zip d'un circuit imprimé possible! Le code ne correspond pas exactement à ce circuit, mais il vous sera facile de l'adapter!!!
