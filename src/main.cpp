@@ -116,8 +116,8 @@ void setup() {
   init_Encoders(1);
 
   line2_lcd_text, line1_lcd_text = "toto";
-  //PressedBoutton1();
-  //PressedBoutton2();
+  PressedBoutton1();
+  PressedBoutton2();
   previousMillis = millis();
   tmp2 = 1;
 
