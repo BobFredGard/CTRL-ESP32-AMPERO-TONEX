@@ -37,6 +37,6 @@ void RecupPathScene () {
     }
     
     LCD.setCursor(11,1);
-    text2 = String(tx1) + "-" + String(tx2) + "-" + String(tx3);
+    text2 = String(tx1) + "-" + String(tx2) + "-" + String(tx3-1);
     LCD.print(text2);
 }

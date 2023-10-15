@@ -45,7 +45,7 @@ void load_preset() {
       tmp5 = 0;
     }
   }
-  for (i = 57; i < 59; i++){
+  if (i == 57){
     if (all_parameters[id][57] == 1299) {
       tmpstomp1 = 0;
     }
