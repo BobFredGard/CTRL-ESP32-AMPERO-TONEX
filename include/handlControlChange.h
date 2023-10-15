@@ -35,18 +35,18 @@ void handleControlChange(byte channel, byte number, byte value) {
     id = id_init + value;
     ampero_count = 0; tonex_count = 0; menus = 0;
     load_preset();
-    //PressedBoutton1();
+    PressedBoutton1();
     Screens(4, 0);
     tmp2 = 0; line1_lcd_text = "toto"; line2_lcd_text = "toto";
   }
   if (channel == 15 && value == 6) {
-    if (tmpstomp2 == 0) {
+    if (tmpstomp2 == 1299) {
       MIDI.sendControlChange(global_control_change[all_parameters[id][58]], 127, canal_midi_2);
-      tmpstomp2 = 1;
+      tmpstomp2 = 1300;
     }
     else {
       MIDI.sendControlChange(global_control_change[all_parameters[id][58]], 0, canal_midi_2);
-      tmpstomp2 = 0;
+      tmpstomp2 = 1299;
     }
   }
 }

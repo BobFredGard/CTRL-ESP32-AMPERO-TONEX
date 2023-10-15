@@ -1,7 +1,15 @@
 void load_Ampero() {
-  if (all_parameters[id][i] == 1299) {MIDI.sendControlChange(global_control_change[i], 0, canal_midi_2);}
-  if (all_parameters[id][i] == 1300) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_2);}
+  if (all_parameters[id][i] == 1299 && i != 58) {MIDI.sendControlChange(global_control_change[i], 0, canal_midi_2);}
+  if (all_parameters[id][i] == 1300 && i != 58) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_2);}
   if (i > 13) {MIDI.sendControlChange(global_control_change[i], all_parameters[id][i], canal_midi_2);}
+  if (all_parameters[id][58] == tmpstomp2) {
+    if (tmpstomp2 == 1299) {
+      MIDI.sendControlChange(global_control_change[58], 0, canal_midi_2);
+    }
+    else {
+      MIDI.sendControlChange(global_control_change[58], 127, canal_midi_2);
+    }
+  }
   //Serial.print(i);Serial.print("="); Serial.print(all_parameters[id][i]);Serial.print("|");
 }
 
@@ -10,8 +18,15 @@ void load_toneX() {
   if (all_parameters[id][i] == 1400) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_1);}
   if (all_parameters[id][i] == 1299) {MIDI.sendControlChange(global_control_change[i], 0, canal_midi_1);}
   if (all_parameters[id][i] == 1300) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_1);}
-  if (all_parameters[id][i] < 128) {if (i != 42) {MIDI.sendControlChange(global_control_change[i], all_parameters[id][i], canal_midi_1);}}
-  if (i == 42) {global_count = 42; ChoixTypeReverb();}
+  if (all_parameters[id][i] < 128) {
+    if (i != 42) {
+      MIDI.sendControlChange(global_control_change[i], all_parameters[id][i], canal_midi_1);
+    }
+  }
+  if (i == 42) {
+    global_count = 42;
+    ChoixTypeReverb();
+  }
   delay(15);
   //Serial.print(i);Serial.print("="); Serial.print(all_parameters[id][i]);Serial.print("|");
 }
@@ -34,7 +49,7 @@ void load_preset() {
   tmp5 = 0;
   //Serial.print(" // "); 
   if (all_parameters[id][55] != all_parameters[preid][55]) {program_change(tonex_bank_choice, all_parameters[id][55], canal_midi_1); }
-  delay(30);
+  delay(50);
   for (i = 18; i < 46; i++){
     if (all_parameters[id][55] != all_parameters[preid][55]) {
       load_toneX();
@@ -45,19 +60,17 @@ void load_preset() {
       tmp5 = 0;
     }
   }
-  if (i == 57){
-    if (all_parameters[id][57] == 1299) {
-      tmpstomp1 = 0;
-    }
-    else {
-      tmpstomp1 = 1;
-    }
-    if (all_parameters[id][58] == 1299) {
-      tmpstomp2 = 0;
-    }
-    else {
-      tmpstomp2 = 1;
-    }
+  /*if (all_parameters[id][57] == 1299) {
+    tmpstomp1 = 1299;
+  }
+  else {
+    tmpstomp1 = 1300;
+  }*/
+  if (all_parameters[id][58] == 1299) {
+    tmpstomp2 = 1299;
+  }
+  else {
+    tmpstomp2 = 1300;
   }
   //Serial.println("");
 }

@@ -20,10 +20,10 @@ void first_load(){
     delay(15);
     if (i == 58) {
       if (all_parameters[id][58] == 1299) {
-        tmpstomp2 = 0;
+        tmpstomp2 = 1299;
       }
       else {
-        tmpstomp2 = 1;
+        tmpstomp2 = 1300;
       }
     }
   }

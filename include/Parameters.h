@@ -6,7 +6,7 @@ static short canal_midi_2 = 7; static short canal_midi_1 = 8;
 static int preid = -1;
 static int ampero_bank_choice, tonex_bank_choice = 0;
 static byte tx1, tx2, tx3 = 1;
-static byte tmpstomp1, tmpstomp2 = 0;
+static int tmpstomp1, tmpstomp2 = 1299;
 
 unsigned long previousMillis = 0;
 unsigned long interval = 3000;

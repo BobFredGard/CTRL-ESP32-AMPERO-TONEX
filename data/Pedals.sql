@@ -59,5 +59,5 @@ ALTER TABLE "stomps"	ADD COLUMN "53"	INT DEFAULT "0"; /* MICS MIX */
 ALTER TABLE "stomps"	ADD COLUMN "54"	INT DEFAULT "54"; /* Position Valeur MAX à charger*/
 ALTER TABLE "stomps"	ADD COLUMN "55"	INT DEFAULT "8";  /* PC ToneX */
 ALTER TABLE "stomps"	ADD COLUMN "56"	INT DEFAULT "99"; /* PC Ampero */
-ALTER TABLE "stomps"	ADD COLUMN "57"	INT DEFAULT "1"; /* Canal MIDI ToneX */
-ALTER TABLE "stomps"	ADD COLUMN "58"	INT DEFAULT "2"; /* Canal MIDI Ampero */
+ALTER TABLE "stomps"	ADD COLUMN "57"	INT DEFAULT "1299"; /* Canal MIDI ToneX */
+ALTER TABLE "stomps"	ADD COLUMN "58"	INT DEFAULT "1299"; /* Canal MIDI Ampero */
