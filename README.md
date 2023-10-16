@@ -1,4 +1,5 @@
 # CTRL VIA ESP32 & PACER AMPERO II STOMP & TONEX
+# Version 1.0.5
 
 J'ai voulu réaliser un outil pour piloter à la fois mon HOTONE AMPERO II STOMP et mon IK-MULTIMEDIA TONEX à partir de mon NEKTAR PACER ou tout autre pédalier MIDI.
 Cet outil peut-être adapté à tous types d'instruments MIDI après quelques modifications du code source bien évidement!
