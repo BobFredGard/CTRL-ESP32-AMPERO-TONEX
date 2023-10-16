@@ -43,12 +43,11 @@ struct Serial2MIDISettings
   static const int8_t TxPin  = 17;
 };
 
-#include "ScaleValueSwitch.h"
-
 #include <midi.h>
 MIDI_CREATE_CUSTOM_INSTANCE(HardwareSerial, Serial2, MIDI, Serial2MIDISettings);
 #define MIDI_CHANNEL_OMNI 0
 
+#include "ScaleValueSwitch.h"
 #include "DataMIDISent.h"
 #include "ChoicTypeReverb.h"
 #include "Screens.h"

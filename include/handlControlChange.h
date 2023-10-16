@@ -18,7 +18,7 @@ void handleControlChange(byte channel, byte number, byte value) {
     ampero_count = 0; tonex_count = 0; menus = 0;
     Select(); 
     load_preset();
-    //PressedBoutton1();
+    PressedBoutton1();
     if (id < 8) {choiced_foot_on_pacer = 1;}
     if (id > 7 && id < 14) {choiced_foot_on_pacer = 2;}
     if (id > 13 && id < 21) {choiced_foot_on_pacer = 3;}

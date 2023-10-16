@@ -1,15 +1,7 @@
 void load_Ampero() {
-  if (all_parameters[id][i] == 1299 && i != 58) {MIDI.sendControlChange(global_control_change[i], 0, canal_midi_2);}
-  if (all_parameters[id][i] == 1300 && i != 58) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_2);}
+  if (all_parameters[id][i] == 1299) {MIDI.sendControlChange(global_control_change[i], 0, canal_midi_2);}
+  if (all_parameters[id][i] == 1300) {MIDI.sendControlChange(global_control_change[i], 127, canal_midi_2);}
   if (i > 13) {MIDI.sendControlChange(global_control_change[i], all_parameters[id][i], canal_midi_2);}
-  if (all_parameters[id][58] == tmpstomp2) {
-    if (tmpstomp2 == 1299) {
-      MIDI.sendControlChange(global_control_change[58], 0, canal_midi_2);
-    }
-    else {
-      MIDI.sendControlChange(global_control_change[58], 127, canal_midi_2);
-    }
-  }
   //Serial.print(i);Serial.print("="); Serial.print(all_parameters[id][i]);Serial.print("|");
 }
 
@@ -44,6 +36,14 @@ void load_preset() {
     if (all_parameters[id][i] != all_data_base_parameters_copy[preid][i] && tmp5 == 0) {
       load_Ampero(); 
       tmp5 = 0;
+    }
+  }
+  if (all_parameters[id][58] == tmpstomp2) {
+    if (tmpstomp2 == 1299) {
+      MIDI.sendControlChange(global_control_change[58], 0, canal_midi_2);
+    }
+    else {
+      MIDI.sendControlChange(global_control_change[58], 127, canal_midi_2);
     }
   }
   tmp5 = 0;
