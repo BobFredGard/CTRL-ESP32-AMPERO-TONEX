@@ -1,6 +1,7 @@
 # CTRL VIA ESP32 & PACER AMPERO II STOMP & TONEX
 # Version 1.1.0
 *** Cette version est ma version prod. J'ai enlevé la partie server car l'antenne wifi générait des interférences avec mes pédalier et pédale!!!
+
 *** Sure cette version, la scène 6 a été retirée au profit de l'activation du stomp de son choix uniquement!!!
 
 J'ai voulu réaliser un outil pour piloter à la fois mon HOTONE AMPERO II STOMP et mon IK-MULTIMEDIA TONEX à partir de mon NEKTAR PACER ou tout autre pédalier MIDI.
