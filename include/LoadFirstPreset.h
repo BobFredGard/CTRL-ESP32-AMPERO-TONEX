@@ -19,7 +19,7 @@ void first_load(){
       MIDI.sendControlChange(global_control_change[i], all_parameters[id][i], canal_midi_1);}}
     delay(20);
     if (i == 58) {
-      if (all_parameters[id][58] == 1299) {
+      if (all_parameters[id][all_parameters[id][58]] == 1299) {
         tmpstomp2 = 1299;
       }
       else {

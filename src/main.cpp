@@ -10,19 +10,19 @@ LiquidCrystal_I2C LCD(0x3F,16,2);
 
 #include <SPIFFS.h>
 
-#include <WiFi.h>
+/*#include <WiFi.h>
 const char *ssid2 = "HUAWEI-B715-A231";
 const char *password2 = "G6TT4Y3H5DA";
 IPAddress ip;
 
-#include "Network.h"
+#include "Network.h"*/
 #include "Sys_Variables.h"
 #include "CSS.h"
 
-#include <ESP32WebServer.h>
+/*#include <ESP32WebServer.h>
 ESP32WebServer server(80);
 #include <ESPmDNS.h>
-#include <DataServer.h>
+#include <DataServer.h>*/
 
 #include <sqlite3.h>
 sqlite3 *db_base;
@@ -120,7 +120,7 @@ void setup() {
   previousMillis = millis();
   tmp2 = 1;
 
-  WiFi.mode(WIFI_AP_STA);
+  /*WiFi.mode(WIFI_AP_STA);
   WiFi.begin(ssid2, password2);
   while (WiFi.status() != WL_CONNECTED) { // Wait for the Wi-Fi to connect
     delay(500);
@@ -138,7 +138,7 @@ void setup() {
   LCD.print("IP");
   LCD.setCursor(2,1);
   LCD.print(ip);
-  delay(5000);
+  delay(5000);*/
 }
 
 void loop(){

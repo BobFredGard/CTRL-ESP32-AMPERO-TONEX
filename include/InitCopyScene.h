@@ -8,7 +8,7 @@ void InitCopyScene(){
   encoder2_copy_destination = 1;
   init_Encoders(7);
   while (menus == 2){
-    server.handleClient(); 
+    //server.handleClient(); 
     if (tmp == 1) {
       Screens(12, 0); 
       CopyPathScene ();
