@@ -4,10 +4,10 @@ static short tonex_quick_values [2] [7] = {{-10, 103, 102, 19, 15, 106, 107}, {0
 
 static const char* ampero_quick_names [7]  {"", "VOLUME     : ", "PARAM 1     : ", "PARAM 2    : ", "PARAM 3    : ", "PEDAL EXP  : ", "REVERB ON  : "};
 static const char*  tonex_quick_names [7] {"", "MODEL.VOL  : ", "GAIN       : ", "COMPRESSOR : ", "GATE       : ", "PRESENCE   : ", "DEPHT      : "};
-static int values_max_ampero_quick [7] = {0,100, 127, 127, 127, 1300, 1300};
-static int values_mini_ampero_quick [7] = {0,0, 0, 0, 0, 1299, 1299};
-static int values_max_tonex_quick [7] = {0,127, 127, 127, 127, 127, 127};
-static int values_mini_tonex_quick [7] = {0,0, 0, 0, 0, 0, 0};
+static short values_max_ampero_quick [7] = {0,100, 127, 127, 127, 1300, 1300};
+static short values_mini_ampero_quick [7] = {0,0, 0, 0, 0, 1299, 1299};
+static short values_max_tonex_quick [7] = {0,127, 127, 127, 127, 127, 127};
+static short values_mini_tonex_quick [7] = {0,0, 0, 0, 0, 0, 0};
 
 
 static const char* global_names [59] = {  "", 
@@ -23,7 +23,7 @@ static const char* global_names [59] = {  "",
   "NB FX MAX  : ", "PC Tone X  : ", "PC Ampero  : ", "STOMP 1 VAL: ", "STOMP 2 VAL: "
 };
 
-static int global_control_change_max_values [57] = {0,
+static short global_control_change_max_values [57] = {0,
   1300,1300,1300,1300,1300,1300,
   1300,1300,1300,1300,1300,1300,
   1300,127,127,127,100,
@@ -36,7 +36,7 @@ static int global_control_change_max_values [57] = {0,
   61,149,300
 };
 
-static int id_values_for_6_foot [37] = {0,1,8,15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,120,127,134,141,148,155,162,169,176,183,190,197,204,211,218,225,232,239,246};
+static short id_values_for_6_foot [37] = {0,1,8,15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,120,127,134,141,148,155,162,169,176,183,190,197,204,211,218,225,232,239,246};
 
 static const char* tonex_reverb_names [5] = {"SPRING1", "SPRING2", "SPRING3", "ROOM ", "PLATE"};
 
