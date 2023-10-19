@@ -1,5 +1,5 @@
 # CTRL VIA ESP32 & PACER AMPERO II STOMP & TONEX
-# Version 1.1.0
+# Version 1.1.1 (Réduction mémoire utilisée de 3%)
 *** Cette version est ma version prod. J'ai enlevé la partie server car l'antenne wifi générait des interférences avec mes pédalier et pédale!!!
 
 *** Sur cette version, la scène 6 a été retirée au profit de l'activation du stomp de mon choix uniquement!!!
