@@ -12,7 +12,7 @@ LiquidCrystal_I2C LCD(0x3F,16,2);
 
 /*#include <WiFi.h>
 const char *ssid2 = "HUAWEI-B715-A231";
-const char *password2 = "G6TT4Y3H5DA";
+const char *password2 = "**********";
 IPAddress ip;
 
 #include "Network.h"
